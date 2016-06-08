@@ -1,5 +1,11 @@
-var ENUM = module.exports = {
-	config: function (opts) {
+/**
+ * @module enum
+ * @public
+ * 
+ * Appends the standard enumerators (copy, clone, each and extend) to the config hash.
+ * */
+module.exports = {
+	config: function (ENUM) {
 		
 		/**
 		 * @method copy
@@ -10,15 +16,15 @@ var ENUM = module.exports = {
 		 * @return {Object} target hash
 		 * 
 		 * Shallow copy of source hash under supervision of callback. If
-		 * a merge key is encountered, the copy becomes a deep merge. 
+		 * a mergeKey key is encountered, the copy becomes a deep mergeKey. 
 		 * If a constructor source key is encountered, the key's methods 
 		 * are added to the source's prototype.
 		 */
-		opts.copy= function(src,tar,cb) {
+		ENUM.copy = function(src,tar,cb) {
 
-			var merge = GEO.merge;
+			var mergeKey = ENUM.mergeKey;
 			
-			if (merge)
+			if (mergeKey)
 				if (cb) {
 					for (var key in src)  {
 						var val = src[key];
@@ -27,8 +33,8 @@ var ENUM = module.exports = {
 								tar[key] = val;
 							else
 							if (val.constructor == Object)
-								if (merge in val) 
-									GEO.copy(val.merge, tar[key]);
+								if (mergeKey in val) 
+									ENUM.copy(val.mergeKey, tar[key]);
 								else
 									tar[key] = val;
 							else 
@@ -42,8 +48,8 @@ var ENUM = module.exports = {
 							tar[key] = val;
 						else
 						if (val.constructor == Object)
-							if (merge in val) 
-								GEO.copy(val.merge, tar[key]);
+							if (mergeKey in val) 
+								ENUM.copy(val.mergeKey, tar[key]);
 							else
 								tar[key] = val;
 						else 
@@ -70,10 +76,10 @@ var ENUM = module.exports = {
 		 * @return {Object} cloned hash
 		 * 
 		 * Shallow clone of source hash under supervision of callback.  If
-		 * a merge key is encountered, the clone becomes a deep merge.
+		 * a mergeKey is encountered, the clone becomes a deep merge.
 		 */
-		opts.clone= function(src,cb) {
-			return GEO.copy(src,{},cb);
+		ENUM.clone = function(src,cb) {
+			return ENUM.copy(src,{},cb);
 		};
 		
 		/**
@@ -84,7 +90,7 @@ var ENUM = module.exports = {
 		 * 
 		 * Shallow enumeration over source hash until callback returns true.
 		 * */
-		opts.each= function(src,cb) {
+		ENUM.each = function(src,cb) {
 			
 			if (src)
 			switch (src.constructor) {
@@ -125,15 +131,23 @@ var ENUM = module.exports = {
 		 * 
 		 * Extend classes with specified methods.
 		 * */
-		opts.extend= function (classes,methods) {
+		ENUM.extend = function (opts,methods) {
 			
 			if (methods)
-				opts.copy(methods, classes.prototype);
+				for (var key in methods) 
+					opts.prototype[key] = methods[key];
 			else
-				opts.each(classes, function (cls, methods) {
-					opts.copy(methods, cls.prototype);				
-				});	
+				for (var key in opts) 
+					switch (key) {
+						case "Array": 	ENUM.extend(Array, opts.Array); break;
+						case "String": 	ENUM.extend(String, opts.String); break;
+						case "Date": 	ENUM.extend(Date, opts.Date); break;
+						case "Object": 	ENUM.extend(Object, opts.Object); break;
+						default:
+							ENUM[key] = opts[key];
+					}
 		};
 		
+		return ENUM;
 	}
 };	
