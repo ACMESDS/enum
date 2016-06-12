@@ -2,7 +2,7 @@
  * @module enum
  * @public
  * 
- * Appends the standard enumerators (copy, clone, each and extend) to the config hash.
+ * Appends the standard enumerators (copy, clone, each, and extend) to the config argument.
  * */
 module.exports = {
 	config: function (ENUM) {
@@ -38,7 +38,7 @@ module.exports = {
 								else
 									tar[key] = val;
 							else 
-								tar[ke] = val;
+								tar[key] = val;
 					}
 				}
 				else 
@@ -49,7 +49,7 @@ module.exports = {
 						else
 						if (val.constructor == Object)
 							if (mergeKey in val) 
-								ENUM.copy(val.mergeKey, tar[key]);
+								ENUM.copy(val[mergeKey], tar[key]);
 							else
 								tar[key] = val;
 						else 
@@ -148,6 +148,7 @@ module.exports = {
 					}
 		};
 		
+
 		return ENUM;
 	}
 };	
