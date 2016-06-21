@@ -2,14 +2,28 @@
  * @class enum
  * @public
  * 
- * Provides a new object with the following enumerators:
+ * Provides a global enumerator with the following methods:
  * 
- * 		config(opts) adjusts this enumerator with given opts
- * 		test(opts,cb) unit-tests a client.js with the function opts.N in opts
- * 		copy(src,tar,drop)  copies shallow src (deep if src.merge) to tar, if !drop(n,src[n])
- * 		each(opts,cb) calls cb(n,opts[n])
- * 		extend(opts,methods) extends opts with methods
- * 		flush() calls all Function opts passed during an extend
+ * 		config(opts) stores a copy of opts into the enumerator 
+ * 		test(opts,cb) unit-tests a client by calling opts[ opts.N ] 
+ * 		copy(src,tar,drop)  shallow/deep copes src to tar, if !drop(n,src[n])
+ * 		each(opts,cb) calls cb( n, opts[n] )
+ * 		extend(opts) adds opts to the enumerator
+ * 		extend(src,methods) extends src constructor with methods
+ * 		flush() calls all opts having a Function-key
+ * 
+ * The copy(opts) and extend(opts) are shallow, unless an opts.merge 
+ * is encountered to provoke a deep copy/extend.  The opts in a 
+ * deep copy/extend will look like this:
+ * 
+ * 		{ key: {merge:{items}} } 
+ * 
+ * to merge (replace or add) the items into tar[key].
+ * 
+ * Array, String, Date, or Object keys in an extend(opts) provoke 
+ * prototype declarations.  An opts Function-key will stack its 
+ * value to the enumerators' callStack, which can be drained later
+ * using the flush() method.
  * */
 
 var MERGEKEY = "merge";
