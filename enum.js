@@ -7,6 +7,7 @@
  * 		config(opts) stores a copy of opts into the enumerator 
  * 		test(opts,cb) unit-tests a client by calling opts[ opts.N ] 
  * 		copy(src,tar,drop)  shallow/deep copes src to tar, if !drop(n,src[n])
+ * 		clone(src,drop) same as copy(src,{},drop) but makes it explicit
  * 		each(opts,cb) calls cb( n, opts[n] )
  * 		extend(opts) adds opts to the enumerator
  * 		extend(src,methods) extends src constructor with methods
