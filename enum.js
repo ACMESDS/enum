@@ -278,5 +278,17 @@ Array.prototype.each = function (cb) {
 	for (var n=0,N=this.length; n<N; n++) cb(n,this[n]);
 };
 
+String.prototype.parse = function(def) {
+	try {
+		return JSON.parse(this);
+	}
+	catch (err) {
+		if (typeof def == "function") 
+			return def(this);
+		else
+			return def;
+	}
+}
+
 module.exports = new ENUM({});
 
