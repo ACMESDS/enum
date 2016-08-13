@@ -8,8 +8,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@git.geointapps.org:geoproto/enum"
+    "url": "git@git.geointapps.org:acme/enum.git"
   },
-  "author": "ACME SDS",
+  "author": "ACME Software Disposal Service",
   "license": "ISC"
 }
