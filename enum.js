@@ -13,16 +13,27 @@
  * 		extend(src,methods) extends src constructor with methods
  * 		flush() calls all opts having a Function-key
  * 
- * The copy(opts) and extend(opts) are shallow, unless an opts.merge 
- * is encountered to provoke a deep copy/extend.  The opts in a 
- * deep copy/extend will look like this:
+ * and prototypes:
  * 
- * 		{ key: {merge:{items}} } 
+ * 		Array.each( (index,value) => {} )
+ * 		String.parse(default)
  * 
- * to merge (replace or add) the items into tar[key].
+ * The copy(src) and clone(src) methods are shallow by default and deep 
+ * when the src contains a "merge: {key: value, ...}" key.  Thus a merge 
+ * key can be used in the opts of config(opts) and extend(opts) to 
+ * replace-or-add additional keys into the default configuration param, so:
  * 
- * Array, String, Date, or Object keys in an extend(opts) provoke 
- * prototype declarations.  An opts Function-key will stack its 
+ * 		param: {
+ * 			merge: {
+ * 				key1: value,
+ * 				key2: value,
+ * 				... 
+ * 		}} 
+ * 
+ * will replace-or-add key1 and key2 into the existing param hash.
+ * 
+ * Note too that Array, String, Date, or Object keys in an extend(opts) 
+ * provoke prototype declarations.  A Function key will stack its 
  * value to the enumerators' callStack, which can be drained later
  * using the flush() method.
  * */
