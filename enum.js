@@ -17,6 +17,7 @@
  * 
  * 		Array.each( (index,value) => {} )
  * 		String.parse(default)
+ * 		String.tag(el,at)
  * 
  * The copy(src) and clone(src) methods are shallow by default and deep 
  * when the src contains a "merge: {key: value, ...}" key.  Thus a merge 
@@ -299,6 +300,33 @@ String.prototype.parse = function(def) {
 		else
 			return def;
 	}
+}
+
+//>>>> moved here from base
+String.prototype.tag = function (el,at) {
+	
+	if (at) {
+		var rtn = "<"+el+" ";
+		
+		for (var n in at) rtn += n + "='" + at[n] + "' ";
+		
+		switch (el) {
+			case "embed":
+			case "img":
+			case "link":
+				return rtn+">" + this;
+			default:
+				return rtn+">" + this + "</"+el+">";
+		}
+		//return rtn+">" + this + "</"+el+">";
+	}
+	else {
+		var rtn = this + "?";
+
+		for (var n in at) rtn += n + "=" + el[n] + "&";
+		return rtn;
+	}
+		
 }
 
 module.exports = new ENUM({});
