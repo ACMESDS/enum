@@ -302,7 +302,6 @@ String.prototype.parse = function(def) {
 	}
 }
 
-//>>>> moved here from base
 String.prototype.tag = function (el,at) {
 	
 	if (at) {
@@ -323,7 +322,7 @@ String.prototype.tag = function (el,at) {
 	else {
 		var rtn = this + "?";
 
-		for (var n in at) rtn += n + "=" + el[n] + "&";
+		for (var n in el) rtn += n + "=" + el[n] + "&";
 		return rtn;
 	}
 		
