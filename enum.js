@@ -39,8 +39,6 @@
  * using the flush() method.
  * */
 
-var MERGEKEY = "merge";
-	
 function ENUM(opts) {
 	this.opts = opts;
 	this.callStack = [];
@@ -54,6 +52,108 @@ function ENUM(opts) {
  * @param {Function} cb callback(idx,val) returns true to drop
  * @return {Object} target hash
  * 
+ * Copy source hash to target hash under supervision of optional callback. 
+ * Source keys are treated as keys into the target; thus a source 
+ * 
+ * 		{	
+ * 			A: value,
+ * 			"A.B.C": value, 
+ * 			"A.B.C.": {X:value, Y:value, ...},
+ * 			OBJECT: [ function X() {}, function Y() {}, ... ]
+ * 			Function: function X() {}
+ * 		} 
+ * 
+ * will, respectively
+ * 
+ * 		set target{A} = value
+ * 		set target[A][B][C] = value 
+ * 		append X,Y to target[A][B][C]
+ * 		set prototype[X,Y,...] of OBJECT (Array,String,Date,Object) = method X,Y, ...
+ * 		append method X to ENUM callback stack
+ * 
+ */
+ENUM.prototype.copy = function (src,tar,cb) {
+
+	for (var key in src) {
+		var val = src[key];
+		
+		switch (key) {
+			case "Array": 
+				val.each(function (n,val) {
+					Array.prototype[val.name] = val; 
+				});
+					
+				break;
+
+			case "String": 
+				val.each(function (n,val) {
+					String.prototype[val.name] = val; 
+				});
+					
+				break;
+				
+			case "Date": 
+				val.each(function (n,val) {
+					Date.prototype[val.name] = val; 
+				});
+					
+				break;
+
+			case "Object": 	
+				val.each(function (n,val) {
+					Object.prototype[val.name] = val; 
+				});
+					
+				break;
+				
+			case "Function": 
+				this.callStack.push( val ); 
+
+				break;
+		
+			default:
+			
+				var keys = key.split("."), Tar=tar;
+				
+				for (var n=0,N=keys.length-1,idx=keys[0] ; 
+						n<N && idx ; 
+						idx=keys[++n]	) 	Tar = Tar[idx];
+
+
+				if (cb && cb(key,val)) {
+					var x=1;
+				}
+				
+				else
+				if (!Tar)
+					throw new Error(keys);
+
+				else
+				if (idx)
+					Tar[idx] = val;
+
+				else
+				if (val.constructor == Object) 
+					for (var n in val) 
+						Tar[n] = val[n];
+
+				else
+					Tar[idx] = val;
+					
+		}
+	}
+
+	return tar;
+};
+	
+/**
+ * @method legacy-copy
+ * @public
+ * @param {Object} src source hash
+ * @param {Object} tar target hash
+ * @param {Function} cb callback(idx,val) returns true to drop
+ * @return {Object} target hash
+ * 
  * Shallow copy of source hash under supervision of callback. If a
  * MERGEKEY is encountered, the copy becomes a deep MERGEKEY, that 
  * is, a src {key:{merge:{items}}} will replace/add items to tar[key].
@@ -61,7 +161,9 @@ function ENUM(opts) {
  * If a constructor source key is encountered, the key's methods 
  * are added to the source's prototype.  
  */
-ENUM.prototype.copy = function (src,tar,cb) {
+
+/*
+ * ENUM.prototype.copy = function (src,tar,cb) {
 
 	if (MERGEKEY)
 		if (cb) {
@@ -71,11 +173,6 @@ ENUM.prototype.copy = function (src,tar,cb) {
 					if (val == null) 
 						tar[key] = val;
 					
-					/*
-					else
-					if (key == EXTENDKEY)
-						this.copy( val, tar ); */
-
 					else
 					if (val.constructor == Object)
 						if (MERGEKEY in val) 
@@ -88,22 +185,16 @@ ENUM.prototype.copy = function (src,tar,cb) {
 		}
 		else 
 			for (var key in src) {
-				var val = src[key];
-				
 				if (val == null) 
 					tar[key] = val;
-				
-				/*
-				else
-				if (key == EXTENDKEY) 
-					this.copy( val, tar ); */
-					
+
 				else
 				if (val.constructor == Object)
 					if (MERGEKEY in val) 
 						this.copy(val[MERGEKEY], tar[key]);
 					else
-						tar[key] = val;
+						tar[key] = val; 
+						
 				else 
 					tar[key] = val;
 			}
@@ -119,7 +210,8 @@ ENUM.prototype.copy = function (src,tar,cb) {
 
 	return tar;
 };
-	
+*/
+
 /**
  * @method clone
  * @public
@@ -188,6 +280,29 @@ ENUM.prototype.each = function (src,cb) {
  * method).
  * */
 ENUM.prototype.extend = function (opts,methods) {
+	
+	if (methods) {
+		methods.each(function (n,method) {
+			opts.prototype[method.name] = method;
+		});
+		return this;
+	}
+	else
+		return this.copy(opts,this);
+}
+
+/**
+ * @method legacy-extend
+ * 
+ * Extend the opts prototype with specified methods, or, if no methods are provided, 
+ * extend this ENUM with the given opts.  Array, String, Date, and Object keys are 
+ * interpretted to extend their respective prototypes.  A Function key is interpretted
+ * to push the function to the ENUM callStack (which can be drained by the ENUM flush
+ * method).
+ * */
+
+/*
+ENUM.prototype.extend = function (opts,methods) {
 		
 	if (methods)
 		for (var key in methods) 
@@ -223,6 +338,7 @@ ENUM.prototype.extend = function (opts,methods) {
 			
 	return this;
 };
+*/
 
 ENUM.prototype.revise = function(opts) {	
 	return this.copy( opts , this.opts);
