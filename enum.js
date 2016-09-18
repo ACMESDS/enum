@@ -291,55 +291,6 @@ ENUM.prototype.extend = function (opts,methods) {
 		return this.copy(opts,this);
 }
 
-/**
- * @method legacy-extend
- * 
- * Extend the opts prototype with specified methods, or, if no methods are provided, 
- * extend this ENUM with the given opts.  Array, String, Date, and Object keys are 
- * interpretted to extend their respective prototypes.  A Function key is interpretted
- * to push the function to the ENUM callStack (which can be drained by the ENUM flush
- * method).
- * */
-
-/*
-ENUM.prototype.extend = function (opts,methods) {
-		
-	if (methods)
-		for (var key in methods) 
-			opts.prototype[key] = methods[key];
-	else
-		for (var key in opts) 
-			switch (key) {
-				case "Array": 	this.extend(Array, opts.Array); break;
-				case "String": 	this.extend(String, opts.String); break;
-				case "Date": 	this.extend(Date, opts.Date); break;
-				case "Object": 	this.extend(Object, opts.Object); break;
-				case "Function": this.callStack.push( opts[key] ); break;
-				
-				default:
-
-					if (MERGEKEY) {
-						var val = opts[key];
-						
-						if (val == null)
-							this[key] = val;
-						else
-						if (val.constructor == Object)
-							if (MERGEKEY in val) 
-								this.copy(val[MERGEKEY], this[key]);
-							else
-								this[key] = val;
-						else 
-							this[key] = val;						
-					}
-					else
-						this[key] = opts[key];
-			}
-			
-	return this;
-};
-*/
-
 ENUM.prototype.revise = function(opts) {	
 	return this.copy( opts , this.opts);
 }
@@ -445,6 +396,10 @@ String.prototype.tag = function (el,at) {
 		
 }
 */
+
+Array.prototype.each = function (cb) {
+	for (var n=0,N=this.length; n<N; n++) cb(n,this[n]);
+}
 
 module.exports = new ENUM({});
 
