@@ -50,11 +50,13 @@ function ENUM(opts) {
  * @public
  * @param {Object} src source hash
  * @param {Object} tar target hash
+ * @param {String} deep copy key deliminator
  * @param {Function} cb callback(idx,val) returns true to drop
  * @return {Object} target hash
  * 
  * Copy source hash to target hash under supervision of optional callback. 
- * Source keys are treated as keys into the target thusly:
+ * If a deep key deliminator (e.g. ".") is specified, the copy is deep where src 
+ * keys are treated as keys into the target thusly:
  * 
  * 		{	
  * 			A: value,			// sets target[A] = value
@@ -75,75 +77,78 @@ function ENUM(opts) {
  * 		} 
  * 
  */
-ENUM.prototype.copy = function (src,tar,cb) {
+ENUM.prototype.copy = function (src,tar,deep,cb) { //$$$$
 
 	for (var key in src) {
 		var val = src[key];
 		
-		switch (key) {
-			case "Array": 
-				val.each(function (n,val) {
-					Array.prototype[val.name] = val; 
-				});
-					
-				break;
+		if (deep)
+			switch (key) {
+				case "Array": 
+					val.each(function (n,val) {
+						Array.prototype[val.name] = val; 
+					});
+						
+					break;
 
-			case "String": 
-				val.each(function (n,val) {
-					String.prototype[val.name] = val; 
-				});
+				case "String": 
+					val.each(function (n,val) {
+						String.prototype[val.name] = val; 
+					});
+						
+					break;
 					
-				break;
-				
-			case "Date": 
-				val.each(function (n,val) {
-					Date.prototype[val.name] = val; 
-				});
-					
-				break;
+				case "Date": 
+					val.each(function (n,val) {
+						Date.prototype[val.name] = val; 
+					});
+						
+					break;
 
-			case "Object": 	
-				val.each(function (n,val) {
-					Object.prototype[val.name] = val; 
-				});
+				case "Object": 	
+					val.each(function (n,val) {
+						Object.prototype[val.name] = val; 
+					});
+						
+					break;
 					
-				break;
-				
-			case "Function": 
-				this.callStack.push( val ); 
+				case "Function": 
+					this.callStack.push( val ); 
 
-				break;
-		
-			default:
+					break;
 			
-				var keys = key.split("."), Tar=tar;
+				default:
 				
-				for (var n=0,N=keys.length-1,idx=keys[0] ; 
-						n<N && idx ; 
-						idx=keys[++n]	) 	Tar = Tar[idx];
-
-
-				if (cb && cb(key,val)) {
-					var x=1;
-				}
-				
-				else
-				if (!Tar)
-					throw new Error(keys);
-
-				else
-				if (idx)
-					Tar[idx] = val;
-
-				else
-				if (val.constructor == Object) 
-					for (var n in val) 
-						Tar[n] = val[n];
-
-				else
-					Tar[idx] = val;
+					var keys = key.split(deep), Tar=tar;
 					
-		}
+					for (var n=0,N=keys.length-1,idx=keys[0] ; 
+							n<N && idx ; 
+							idx=keys[++n]	) 	Tar = Tar[idx];
+
+
+					if (cb && cb(key,val)) {
+						var x=1;
+					}
+					
+					else
+					if (!Tar)
+						throw new Error(keys);
+
+					else
+					if (idx)
+						Tar[idx] = val;
+
+					else
+					if (val.constructor == Object) 
+						for (var n in val) 
+							Tar[n] = val[n];
+
+					else
+						Tar[idx] = val;
+						
+			}
+		else
+			tar[key] = val;
 	}
 
 	return tar;
@@ -223,7 +228,7 @@ ENUM.prototype.copy = function (src,tar,cb) {
  * a MERGEKEY is encountered, the clone becomes a deep merge.
  */
 ENUM.prototype.clone = function (opts,cb) {
-	return this.copy(opts,{},cb);
+	return this.copy(opts,{},null,cb);  //$$$$
 };
 
 /**
@@ -288,12 +293,13 @@ ENUM.prototype.extend = function (opts,methods) {
 		return this;
 	}
 	else
-		return this.copy(opts,this);
+		return this.copy(opts,this,".");  //$$$$
 }
 
-ENUM.prototype.revise = function(opts) {	
+/*
+ENUM.prototype.revise = function(opts) {	//$$$$
 	return this.copy( opts , this.opts);
-}
+}*/
 
 /**
  * extend or replace the existing ENUM configuration.
@@ -309,7 +315,7 @@ ENUM.prototype.config = function (opts) {
  * */
 ENUM.prototype.test = function (opts) {
 	
-	var N = opts.N || process.argv[3];
+	var N = opts.N || process.argv[2]; //$$$$
 
 	if (N in opts)
 		if (typeof opts[N] == "function") {
