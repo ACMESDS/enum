@@ -77,7 +77,7 @@ function ENUM(opts) {
  * 		} 
  * 
  */
-ENUM.prototype.copy = function (src,tar,deep,cb) { //$$$$
+ENUM.prototype.copy = function (src,tar,deep,cb) {
 
 	for (var key in src) {
 		var val = src[key];
@@ -228,7 +228,7 @@ ENUM.prototype.copy = function (src,tar,deep,cb) { //$$$$
  * a MERGEKEY is encountered, the clone becomes a deep merge.
  */
 ENUM.prototype.clone = function (opts,cb) {
-	return this.copy(opts,{},null,cb);  //$$$$
+	return this.copy(opts,{},null,cb);
 };
 
 /**
@@ -293,13 +293,8 @@ ENUM.prototype.extend = function (opts,methods) {
 		return this;
 	}
 	else
-		return this.copy(opts,this,".");  //$$$$
+		return this.copy(opts,this,"."); 
 }
-
-/*
-ENUM.prototype.revise = function(opts) {	//$$$$
-	return this.copy( opts , this.opts);
-}*/
 
 /**
  * extend or replace the existing ENUM configuration.
@@ -315,7 +310,7 @@ ENUM.prototype.config = function (opts) {
  * */
 ENUM.prototype.test = function (opts) {
 	
-	var N = opts.N || process.argv[2]; //$$$$
+	var N = opts.N || process.argv[2];
 
 	if (N in opts)
 		if (typeof opts[N] == "function") {
