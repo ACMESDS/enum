@@ -1,13 +1,14 @@
+// UNCLASSIFIED $$$$
+
 /**
- * @class enum
- * @public
+ * @module enum
  * 
- * Provides a global enumerator with the following methods:
+ * Provides an enumerator with the following methods:
  * 
  * 		config(opts) stores a copy of opts into the enumerator 
  * 		test(opts,cb) unit-tests a client by calling opts[ opts.N ] 
- * 		copy(src,tar,drop)  shallow/deep copy src to tar, if !drop(n,src[n])
- * 		clone(src,drop) same as copy(src,{},drop) but makes it explicit
+ * 		copy(src,tar,deep,cb)  shallow/deep copy src to tar
+ * 		clone(src,cb) same as copy(src,{},deep,cb) 
  * 		each(opts,cb) calls cb( n, opts[n] )
  * 		extend(opts) adds opts to the enumerator
  * 		extend(src,methods) extends src constructor with methods
@@ -40,8 +41,8 @@
  * 
  * */
 
-function ENUM(opts) {
-	this.opts = opts;
+function ENUM(opts) { //$$$$
+	if (opts) this.copy(opts,this);
 	this.callStack = [];
 }
 
@@ -132,7 +133,7 @@ ENUM.prototype.copy = function (src,tar,deep,cb) {
 					
 					else
 					if (!Tar)
-						throw new Error(keys);
+						throw new Error(`no copy target "${keys}"`);
 
 					else
 					if (idx)
@@ -224,8 +225,7 @@ ENUM.prototype.copy = function (src,tar,deep,cb) {
  * @param {Function} cb callback(idx,val) returns true to drop
  * @return {Object} cloned hash
  * 
- * Shallow clone of source hash under supervision of callback.  If
- * a MERGEKEY is encountered, the clone becomes a deep merge.
+ * Shallow clone of source hash under supervision of callback.  
  */
 ENUM.prototype.clone = function (opts,cb) {
 	return this.copy(opts,{},null,cb);
@@ -306,7 +306,7 @@ ENUM.prototype.config = function (opts) {
 /**
  * @method test
  * 
- * Unit-test this ENUM as documented in the client.js units.
+ * Unit-test a module as documented in its config.js.
  * */
 ENUM.prototype.test = function (opts) {
 	
@@ -334,7 +334,7 @@ ENUM.prototype.test = function (opts) {
 				return console.log(`Test ${tests} is available`);
 				
 			default:						
-				console.log(`Tests ${tests} are available`);
+				console.log(`Configurations ${tests} are available`);
 		}
 	}
 	
@@ -402,5 +402,6 @@ Array.prototype.each = function (cb) {
 	for (var n=0,N=this.length; n<N; n++) cb(n,this[n]);
 }
 
-module.exports = new ENUM({});
+module.exports = new ENUM();
 
+// UNCLASSIFIED
