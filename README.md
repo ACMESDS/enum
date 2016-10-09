@@ -19,7 +19,7 @@ where:
 callback cb(value) returning true to drop.  If a deep key deliminator (e.g. ".") is 
 specified, the copy is deep where src keys are treated as keys into the target thusly:
 
-	{	
+	{
 		A: value,			// sets target[A] = value
 
 		"A.B.C": value, 	// sets target[A][B][C] = value
@@ -35,7 +35,7 @@ specified, the copy is deep where src keys are treated as keys into the target t
 
 		Function: 			// append method X to ENUM callback stack
 			function X() {}
-	} 
+	}
 
 + clone() will shallow copy the src source hash under supervision of a copy() callback.  
 
