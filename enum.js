@@ -6,37 +6,38 @@
  * 
  * 		config(opts) stores a copy of opts into the enumerator 
  * 		test(opts,cb) unit-tests a client by calling opts[ opts.N ] 
- * 		copy(src,tar,drop)  shallow/deep copes src to tar, if !drop(n,src[n])
+ * 		copy(src,tar,drop)  shallow/deep copy src to tar, if !drop(n,src[n])
  * 		clone(src,drop) same as copy(src,{},drop) but makes it explicit
  * 		each(opts,cb) calls cb( n, opts[n] )
  * 		extend(opts) adds opts to the enumerator
  * 		extend(src,methods) extends src constructor with methods
  * 		flush() calls all opts having a Function-key
  * 
- * and prototypes:
+ * Usage:
+ * 		
+ * 		// From, say, asm.js
+ * 		var
+ * 			ENUM = require("enum"),
+ * 			Copy = ENUM.copy,
+ * 			Clone = ENUM.close,
+ * 			Each = ENUM.each,
+ * 			ASM = module.exports = ENUM.extend({  // see ENUM.copy for key syntax
+ * 				key: value,
+ * 				key: value,
+ * 				:
+ * 				:
+ *			});
  * 
- * 		Array.each( (index,value) => {} )
- * 		String.parse(default)
- * 		String.tag(el,at)
+ * 		// then extended again from, say, nextasm.js
  * 
- * The copy(src) and clone(src) methods are shallow by default and deep 
- * when the src contains a "merge: {key: value, ...}" key.  Thus a merge 
- * key can be used in the opts of config(opts) and extend(opts) to 
- * replace-or-add additional keys into the default configuration param, so:
+ * 		var 
+ * 			ASM = require("asm"),
+ * 			NEXTASM = module.exports = ASM.extend({
+ * 				key: value,
+ * 				:
+ * 				:
+ * 			});
  * 
- * 		param: {
- * 			merge: {
- * 				key1: value,
- * 				key2: value,
- * 				... 
- * 		}} 
- * 
- * will replace-or-add key1 and key2 into the existing param hash.
- * 
- * Note too that Array, String, Date, or Object keys in an extend(opts) 
- * provoke prototype declarations.  A Function key will stack its 
- * value to the enumerators' callStack, which can be drained later
- * using the flush() method.
  * */
 
 function ENUM(opts) {
@@ -53,23 +54,25 @@ function ENUM(opts) {
  * @return {Object} target hash
  * 
  * Copy source hash to target hash under supervision of optional callback. 
- * Source keys are treated as keys into the target; thus a source 
+ * Source keys are treated as keys into the target thusly:
  * 
  * 		{	
- * 			A: value,
- * 			"A.B.C": value, 
- * 			"A.B.C.": {X:value, Y:value, ...},
- * 			OBJECT: [ function X() {}, function Y() {}, ... ]
- * 			Function: function X() {}
+ * 			A: value,			// sets target[A] = value
+ * 
+ * 			"A.B.C": value, 	// sets target[A][B][C] = value
+ * 
+ * 			"A.B.C.": {			// appends X,Y to target[A][B][C]
+ * 				X:value, Y:value, ...
+ * 			},	
+ * 
+ * 			OBJECT: [ 			// prototype OBJECT (Array,String,Date,Object) = method X,Y, ...
+ * 				function X() {}, 
+ * 				function Y() {}, 
+ * 			... ],
+ * 
+ * 			Function: 			// append method X to ENUM callback stack
+ * 				function X() {}
  * 		} 
- * 
- * will, respectively
- * 
- * 		set target{A} = value
- * 		set target[A][B][C] = value 
- * 		append X,Y to target[A][B][C]
- * 		set prototype[X,Y,...] of OBJECT (Array,String,Date,Object) = method X,Y, ...
- * 		append method X to ENUM callback stack
  * 
  */
 ENUM.prototype.copy = function (src,tar,cb) {
@@ -146,7 +149,7 @@ ENUM.prototype.copy = function (src,tar,cb) {
 	return tar;
 };
 	
-/**
+/*
  * @method legacy-copy
  * @public
  * @param {Object} src source hash
@@ -160,9 +163,6 @@ ENUM.prototype.copy = function (src,tar,cb) {
  * 
  * If a constructor source key is encountered, the key's methods 
  * are added to the source's prototype.  
- */
-
-/*
  * ENUM.prototype.copy = function (src,tar,cb) {
 
 	if (MERGEKEY)
@@ -402,6 +402,7 @@ ENUM.prototype.flush = function () {
 	
 }
 
+/*
 Array.prototype.each = function (cb) {
 	for (var n=0,N=this.length; n<N; n++) cb(n,this[n]);
 };
@@ -443,6 +444,7 @@ String.prototype.tag = function (el,at) {
 	}
 		
 }
+*/
 
 module.exports = new ENUM({});
 
