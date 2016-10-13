@@ -41,7 +41,7 @@
  * 
  * */
 
-function ENUM(opts) { //$$$$
+function ENUM(opts) { 
 	if (opts) this.copy(opts,this);
 	this.callStack = [];
 }
