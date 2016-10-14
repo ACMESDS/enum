@@ -4,22 +4,23 @@
 
 Totem's ENUM module provides the following inheritable enumerator methods:
 
-	config(opts) stores a copy of opts into the enumerator 
-	test(opts,cb) unit-tests a client by calling opts[ opts.N ] 
-	copy(src,tar,deep,cb)  shallow/deep copy src to tar
-	clone(src,cb) same as copy(src,{},deep,cb) 
-	each(opts,cb) calls cb( n, opts[n] )
-	extend(opts) adds opts to the enumerator
-	extend(src,methods) extends src constructor with methods
-	flush() calls all opts having a Function-key
+	config(opts) 				// stores a copy of opts into the enumerator 
+	test(opts,cb) 				// unit-tests a client by calling opts[ opts.N ] 
+	copy(src,tar,deep,cb)  // shallow/deep copy src to tar
+	clone(src,cb) 				// same as copy(src,{},deep,cb) 
+	each(opts,cb) 				// calls cb( n, opts[n] )
+	extend(opts) 				// adds opts to the enumerator
+	extend(src,methods) 	// extends src constructor with methods
+	flush() 						// calls all opts having a Function-key
  
 where:
 
-+ copy() will copy the source src to a target tar under supervision of an optional 
-callback cb(value) returning true to drop.  If a deep key deliminator (e.g. ".") is 
++ copy() will copy the source src to a target tar under supervision of an optional callback 
+cb(value) returning true to drop.  If a deep key deliminator (e.g. ".") is 
 specified, the copy is deep where src keys are treated as keys into the target thusly:
 
-	{ 	A: value,			// sets target[A] = value
+	{ 
+		A: value,			// sets target[A] = value
 
 		"A.B.C": value, 	// sets target[A][B][C] = value
 
@@ -52,17 +53,15 @@ method).
 
 Download and unzip into your project/debe folder and revise the project/config module as needed
 for your [Totem](https://git.geointapps.org/acmesds/transfer) project.  Typically, you will
-want to:
+want to redirect the following to your project/config
 
 	ln -s project/config/debe.sh config.sh
 	ln -s project/config/maint.sh maint.sh
 	ln -s project/config/certs certs
 	
-to override the defaults.
+## Examples
 
-## Usage
-
-	// From, say, asm.js
+From, say, asm.js
 
 	var
 		ENUM = require("enum"),
@@ -76,7 +75,7 @@ to override the defaults.
 			:
 		});
 
-	// then extended again from, say, nextasm.js
+then extended again from, say, nextasm.js
 
 	var 
 		ASM = require("asm"),
