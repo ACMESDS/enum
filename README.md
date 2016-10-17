@@ -51,14 +51,12 @@ method).
 
 ## Installation
 
-Download and unzip into your project/debe folder and revise the project/config module as needed
-for your [Totem](https://git.geointapps.org/acmesds/transfer) project.  Typically, you will
-want to redirect the following to your project/config
+Download the latest version with
 
-	ln -s project/config/debe.sh config.sh
-	ln -s project/config/maint.sh maint.sh
-	ln -s project/config/certs certs
+	git clone https://git.geointapps.org/acmesds/enum
 	
+See [Totem downloads](https://git.geointapps.org/acmesds/download) for optional Totem plugins.
+
 ## Examples
 
 From, say, asm.js
