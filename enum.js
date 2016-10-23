@@ -1,8 +1,7 @@
 // UNCLASSIFIED 
 
 /**
- * @module enum
- * @include README.md
+ * @class enum
  * */
 
 function ENUM(opts) { 

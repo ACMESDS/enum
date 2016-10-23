@@ -1,8 +1,8 @@
+/**
+@class enum [![Forked from SourceForge](https://sourceforge.net)]
 # ENUM
 
-[![Forked from SourceForge](https://sourceforge.net)]
-
-The ENUM module provides the following inheritable enumerator methods:
+The ENUM NodeJS module provides the following inheritable enumerator methods:
 
 	config(opts) 				// stores a copy of opts into the enumerator 
 	test(opts,cb) 				// unit-tests a client by calling opts[ opts.N ] 
@@ -90,3 +90,5 @@ then extended again from, say, nextasm.js
 ## License
 
 [MIT](LICENSE)
+
+*/
