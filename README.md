@@ -1,8 +1,8 @@
-# Totem DEBE
+# ENUM
 
 [![Forked from SourceForge](https://sourceforge.net)]
 
-Totem's ENUM module provides the following inheritable enumerator methods:
+The ENUM module provides the following inheritable enumerator methods:
 
 	config(opts) 				// stores a copy of opts into the enumerator 
 	test(opts,cb) 				// unit-tests a client by calling opts[ opts.N ] 
@@ -55,7 +55,10 @@ Download the latest version with
 
 	git clone https://git.geointapps.org/acmesds/enum
 	
-See [Totem downloads](https://git.geointapps.org/acmesds/download) for optional Totem plugins.
+Typically, you will want to redirect the following to your project/master
+
+	ln -s ../master/test.js test.js
+	ln -s ../master/maint.sh maint.sh
 
 ## Examples
 

@@ -1,44 +1,8 @@
-// UNCLASSIFIED $$$$
+// UNCLASSIFIED 
 
 /**
  * @module enum
- * 
- * Provides an enumerator with the following methods:
- * 
- * 		config(opts) stores a copy of opts into the enumerator 
- * 		test(opts,cb) unit-tests a client by calling opts[ opts.N ] 
- * 		copy(src,tar,deep,cb)  shallow/deep copy src to tar
- * 		clone(src,cb) same as copy(src,{},deep,cb) 
- * 		each(opts,cb) calls cb( n, opts[n] )
- * 		extend(opts) adds opts to the enumerator
- * 		extend(src,methods) extends src constructor with methods
- * 		flush() calls all opts having a Function-key
- * 
- * Usage:
- * 		
- * 		// From, say, asm.js
- * 		var
- * 			ENUM = require("enum"),
- * 			Copy = ENUM.copy,
- * 			Clone = ENUM.close,
- * 			Each = ENUM.each,
- * 			ASM = module.exports = ENUM.extend({  // see ENUM.copy for key syntax
- * 				key: value,
- * 				key: value,
- * 				:
- * 				:
- *			});
- * 
- * 		// then extended again from, say, nextasm.js
- * 
- * 		var 
- * 			ASM = require("asm"),
- * 			NEXTASM = module.exports = ASM.extend({
- * 				key: value,
- * 				:
- * 				:
- * 			});
- * 
+ * @include README.md
  * */
 
 function ENUM(opts) { 
