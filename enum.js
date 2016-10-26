@@ -112,6 +112,9 @@ ENUM.prototype.copy = function (src,tar,deep,cb) {
 						
 			}
 		else
+		if (cb) 
+			tar[key] = cb( key, val);
+		else
 			tar[key] = val;
 	}
 
