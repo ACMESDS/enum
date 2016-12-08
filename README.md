@@ -2,7 +2,7 @@
 @class enum [![Forked from SourceForge](https://sourceforge.net)]
 # ENUM
 
-The ENUM NodeJS module provides the following inheritable enumerator methods:
+ENUM provides a module the following inheritable enumerators:
 
 	config(opts) 				// stores a copy of opts into the enumerator 
 	test(opts,cb) 				// unit-tests a client by calling opts[ opts.N ] 
@@ -55,12 +55,7 @@ Download the latest version with
 
 	git clone https://git.geointapps.org/acmesds/enum
 	
-Typically, you will want to redirect the following to your project/master
-
-	ln -s ../master/test.js test.js
-	ln -s ../master/maint.sh maint.sh
-
-## Examples
+## Usage
 
 From, say, asm.js
 
