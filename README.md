@@ -4,7 +4,6 @@
 
 ENUM provides a module the following inheritable enumerators:
 
-	config(opts) 				// stores a copy of opts into the enumerator 
 	test(opts,cb) 				// unit-tests a client by calling opts[ opts.N ] 
 	copy(src,tar,deep,cb)  // shallow/deep copy src to tar
 	clone(src,cb) 				// same as copy(src,{},deep,cb) 
