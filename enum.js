@@ -18,6 +18,7 @@ ENUM.prototype = {
 					console.log(pre+msg);
 					break;
 
+				case Error:
 				case Object:
 					console.log(pre,msg);
 					break;
