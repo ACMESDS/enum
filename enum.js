@@ -402,38 +402,45 @@ Array.prototype.each = 	function (cb) {
 
 module.exports = new ENUM({
 	String: [
+		function tagurl(at) {
+			var rtn = this;
+			
+			for (var n in at) {
+				rtn += "&" + n + "=";
+				switch ( (at[n] || 0).constructor ) {
+					//case Array: rtn += at[n].join(",");	break;
+					case Array:
+					case Date:
+					case Object: rtn += JSON.stringify(at[n]); break;
+					default: rtn += at[n];
+				}
+			}
+			return rtn;
+		},	
+		
 		/**
 		@method tag
 		@member String
 		*/
 		function tag(el,at) {
 
-			if (el.constructor == String) {
-				var rtn = "<"+el+" ";
+			var rtn = "<"+el+" ";
 
-				if (at)  
-					for (var n in at) rtn += n + "='" + at[n] + "' ";
+			if (at)  
+				for (var n in at) rtn += n + "='" + at[n] + "' ";
 
-				switch (el) {
-					case "embed":
-					case "img":
-					case "link":
-					case "input":
-						return rtn+">" + this;
-					default:
-						return rtn+">" + this + "</"+el+">";
-				}
-				//return rtn+">" + this + "</"+el+">";
-			}
-
-			else {
-				var rtn = this;
-
-				for (var n in el) rtn += "&" + n + "=" + el[n];
-				return rtn;
+			switch (el) {
+				case "embed":
+				case "img":
+				case "link":
+				case "input":
+					return rtn+">" + this;
+				default:
+					return rtn+">" + this + "</"+el+">";
 			}
 
 		}
+		
 	]
 });
 
