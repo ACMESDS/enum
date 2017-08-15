@@ -145,19 +145,6 @@ ENUM.prototype = {
 	},
 	
 	/**
- * @method clone
- * @public
- * @param {Object} src source hash
- * @param {Function} cb callback(idx,val) returns true to drop
- * @return {Object} cloned hash
- * 
- * Shallow clone of source hash under supervision of callback.  
- */
-	clone: function (opts,cb) {
-		return this.copy(opts,{},null,cb);
-	},
-	
-	/**
 	 * @method each
 	 * @public
 	 * @param {Object} src source hash
