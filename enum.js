@@ -393,7 +393,7 @@ module.exports = new ENUM({
 			var rtn = this;
 			
 			for (var n in at) {
-				rtn += "&" + n + "=";
+				rtn += n + "=";
 				switch ( (at[n] || 0).constructor ) {
 					//case Array: rtn += at[n].join(",");	break;
 					case Array:
@@ -401,6 +401,7 @@ module.exports = new ENUM({
 					case Object: rtn += JSON.stringify(at[n]); break;
 					default: rtn += at[n];
 				}
+				rtn += "&";
 			}
 			return rtn;
 		},	
