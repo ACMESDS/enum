@@ -1,8 +1,13 @@
 /**
-@class enum [![Forked from SourceForge](https://sourceforge.net)]
+@class ENUM 
+	[SourceForge](https://sourceforge.net) 
+	[github](https://github.com/acmesds/enum.git) 
+	[geointapps](https://git.geointapps.org/acmesds/enum)
+	[gitlab](https://gitlab.weat.nga.ic.gov/acmesds/enum.git)
+	
 # ENUM
 
-ENUM provides a module the following inheritable enumerators:
+ENUM provides a a common core of enumerators:
 
 	test(opts,cb) 				// unit-tests a client by calling opts[ opts.N ] 
 	copy(src,tar,deep,cb)  // shallow/deep copy src to tar
@@ -50,11 +55,9 @@ method).
 
 ## Installation
 
-Download the latest version with
-
-	git clone https://git.geointapps.org/acmesds/enum
+Clone from one of the repos. 
 	
-## Usage
+## Use
 
 From, say, asm.js
 

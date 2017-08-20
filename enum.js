@@ -1,9 +1,5 @@
 /// UNCLASSIFIED 
 
-/**
- * @class enum
- * */
-
 function ENUM(opts) { 
 	if (opts) this.copy(opts,this,".");
 	this.callStack = [];
@@ -32,7 +28,7 @@ ENUM.prototype = {
 	
 	/**
 	 * @method copy
-	 * @public
+	 * @member ENUM
 	 * @param {Object} src source hash
 	 * @param {Object} tar target hash
 	 * @param {String} deep copy key deliminator
@@ -146,7 +142,7 @@ ENUM.prototype = {
 	
 	/**
 	 * @method each
-	 * @public
+	 * @member ENUM
 	 * @param {Object} src source hash
 	 * @param {Function} cb callback (idx,val) returning true or false
 	 * 
@@ -190,7 +186,7 @@ ENUM.prototype = {
 
 	/**
 	 * @method extend
-	 * 
+	 * @member ENUM
 	 * Extend the opts prototype with specified methods, or, if no methods are provided, 
 	 * extend this ENUM with the given opts.  Array, String, Date, and Object keys are 
 	 * interpretted to extend their respective prototypes.  A Function key is interpretted
@@ -211,15 +207,8 @@ ENUM.prototype = {
 	},
 
 	/**
-	 * Replace existing ENUM configuration.
-	 * */
-	/*config: function (opts) {
-		return new ENUM(opts);
-	},*/
-
-	/**
 	 * @method test
-	 * 
+	 * @member ENUM
 	 * Unit-test a module as documented in its config.js.
 	 * */
 	test: function (opts) {
@@ -259,7 +248,8 @@ ENUM.prototype = {
 
 	/**
 	 * @method flush
-	 * 
+	 * @private
+	 * @member ENUM
 	 * Flush the ENUM call stack defined by the extend() Function keys.
 	 * */
 	flush: function () {
