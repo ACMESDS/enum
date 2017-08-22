@@ -146,10 +146,33 @@ ENUM.prototype = {
 	 * @param {Object} src source hash
 	 * @param {Function} cb callback (idx,val) returning true or false
 	 * 
-	 * Shallow enumeration over source hash until callback returns true.
+	 * Enumerate over source until optional callback(key,val,isLast) returns isEmpty.  Returns isEmpty.
 	 * */
 	each: function (src,cb) {
-	
+
+		if  (src.constructor == Object) {
+			var last = null; 
+			
+			for (var key in src) last = key;
+			
+			if ( last && cb )
+				for (var key in src)  
+					if ( cb( key, src[key], key == last) ) return true;
+				
+			return last == null;
+		}
+		
+		else {
+			var keys = Object.keys(src), N=keys.length, last = N-1;
+			
+			if ( cb )
+				for (var n=0; n<N; n++)  
+					if ( cb( key=keys[n], src[key], n == last ) ) return true;
+			
+			return last<0;
+		}
+			
+		/*
 		if (src)
 			switch (src.constructor) {
 				case String:
@@ -182,6 +205,7 @@ ENUM.prototype = {
 					return false;
 
 			}
+			*/
 	},
 
 	/**
@@ -372,9 +396,17 @@ String.prototype.tag = function (el,at) {
 /**
 @method each
 @member Array
+Enumerate through array until optional callback(idx, val, isLast) returns isEmpty.  Returns isEmpty.
 */
 Array.prototype.each = 	function (cb) {
-	for (var n=0,N=this.length; n<N; n++) cb(n,this[n]);
+	var N=this.length, last=N-1;
+	
+	if (cb) 
+		for (var n=0; n<N; n++) 
+			if ( cb(n, this[n], n == last) ) return true;
+		
+	return last<0;
+	
 }
 
 module.exports = new ENUM({
