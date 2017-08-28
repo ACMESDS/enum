@@ -150,17 +150,23 @@ ENUM.prototype = {
 	 * */
 	each: function (src,cb) {
 
-		if  (src.constructor == Object) {
-			var last = null; 
+		if  (src.constructor == Object) 
+			if ( cb ) {
+				var last = null; 
+
+				for (var key in src) last = key;
+
+				if ( last && cb )
+					for (var key in src)  
+						if ( cb( key, src[key], key == last) ) return true;
+
+				return last == null;
+			}
 			
-			for (var key in src) last = key;
-			
-			if ( last && cb )
-				for (var key in src)  
-					if ( cb( key, src[key], key == last) ) return true;
-				
-			return last == null;
-		}
+			else {
+				for (var key in src) return false;
+				return true;
+			}
 		
 		else {
 			var keys = Object.keys(src), N=keys.length, last = N-1;
