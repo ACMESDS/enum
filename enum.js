@@ -5,25 +5,35 @@ function ENUM(opts) {
 	this.callStack = [];
 }
 
-
 ENUM.prototype = {
-	trace: function (pre,msg,arg) {	
-		if (msg)
-			switch (msg.constructor) {
-				case String: 
-					console.log(pre+msg);
-					break;
+	trace: function (pre,msg,sql) {	
+		if (msg.constructor == String)
+			if (sql) {
+				var 
+					parts = msg.split(" "),
+					action = parts[0],
+					target = parts[1],
+					client = "";
 
-				case Error:
-				case Object:
-					console.log(pre,msg);
-					break;
+				parts.each( function (n,part) {
+					if ( part == "FOR" ) client = parts[n+1];
+				});
 
-				default:
-					console.log(pre,msg.sql);
+				sql.query("INSERT INTO openv.syslogs SET ?", {
+					Action: action,
+					Target: target,
+					Module: pre,
+					t: new Date(),
+					Client: client
+				});
+				
+				console.log(pre+msg);
 			}
-
-		if (arg) console.log(pre,arg);
+			else
+				console.log(pre+msg);
+		
+		else
+			console.log(pre,msg);
 	},
 	
 	/**
@@ -291,113 +301,6 @@ ENUM.prototype = {
 	}
 
 };
-
-/*
-// legacy
-Array.prototype.each = function (cb) {
-	for (var n=0,N=this.length; n<N; n++) cb(n,this[n]);
-};
-
-String.prototype.parse = function(def) {
-	try {
-		return JSON.parse(this);
-	}
-	catch (err) {
-		if (typeof def == "function") 
-			return def(this);
-		else
-			return def;
-	}
-}
-
-String.prototype.tag = function (el,at) {
-	
-	if (at) {
-		var rtn = "<"+el+" ";
-		
-		for (var n in at) rtn += n + "='" + at[n] + "' ";
-		
-		switch (el) {
-			case "embed":
-			case "img":
-			case "link":
-				return rtn+">" + this;
-			default:
-				return rtn+">" + this + "</"+el+">";
-		}
-		//return rtn+">" + this + "</"+el+">";
-	}
-	else {
-		var rtn = this + "?";
-
-		for (var n in el) rtn += n + "=" + el[n] + "&";
-		return rtn;
-	}
-		
-}
-*/
-/*
- * @method legacy-copy
- * @public
- * @param {Object} src source hash
- * @param {Object} tar target hash
- * @param {Function} cb callback(idx,val) returns true to drop
- * @return {Object} target hash
- * 
- * Shallow copy of source hash under supervision of callback. If a
- * MERGEKEY is encountered, the copy becomes a deep MERGEKEY, that 
- * is, a src {key:{merge:{items}}} will replace/add items to tar[key].
- * 
- * If a constructor source key is encountered, the key's methods 
- * are added to the source's prototype.  
- * ENUM.prototype.copy = function (src,tar,cb) {
-
-	if (MERGEKEY)
-		if (cb) {
-			for (var key in src)  {
-				var val = src[key];
-				if ( !cb(key,val) ) 
-					if (val == null) 
-						tar[key] = val;
-
-					else
-					if (val.constructor == Object)
-						if (MERGEKEY in val) 
-							this.copy(val.MERGEKEY, tar[key]);
-						else
-							tar[key] = val;
-					else 
-						tar[key] = val;
-			}
-		}
-		else 
-			for (var key in src) {
-				if (val == null) 
-					tar[key] = val;
-
-				else
-				if (val.constructor == Object)
-					if (MERGEKEY in val) 
-						this.copy(val[MERGEKEY], tar[key]);
-					else
-						tar[key] = val; 
-
-				else 
-					tar[key] = val;
-			}
-	else 
-		if (cb) {
-			for (var key in src) 
-				if ( !cb(key,src[key]) ) 
-					tar[key] = src[key];
-		}
-		else 
-			for (var key in src) 
-				tar[key] = src[key];
-
-	return tar;
-};
-*/
 
 /**
 @method each
