@@ -27,10 +27,10 @@ ENUM.prototype = {
 					Client: client
 				});
 				
-				console.log(pre+msg);
+				console.log(pre,msg);
 			}
 			else
-				console.log(pre+msg);
+				console.log(pre,msg);
 		
 		else
 			console.log(pre,msg);
