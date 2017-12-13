@@ -318,6 +318,20 @@ Array.prototype.each = 	function (cb) {
 	
 }
 
+Array.prototype.joinify = 	function (sep,cb) {
+	
+	if (cb) {
+		var rtn = [];
+		this.each( function (n,rec) {
+			rtn.push( cb(rec) );
+		});
+		return rtn.join(sep);
+	}
+
+	else
+		return this.join(sep);
+}
+
 module.exports = new ENUM({
 	String: [
 		function tagurl(at) {
