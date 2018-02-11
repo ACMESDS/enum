@@ -11,7 +11,6 @@ ENUM provides a a common core of enumerators:
 
 	test(opts,cb) 				// unit-tests a client by calling opts[ opts.N ] 
 	copy(src,tar,deep,cb)  // shallow/deep copy src to tar
-	clone(src,cb) 				// same as copy(src,{},deep,cb) 
 	each(opts,cb) 				// calls cb( n, opts[n] )
 	extend(opts) 				// adds opts to the enumerator
 	extend(src,methods) 	// extends src constructor with methods

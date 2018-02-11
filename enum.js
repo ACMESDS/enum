@@ -36,6 +36,7 @@ ENUM.prototype = {
 			console.log(pre,msg);
 	},
 	
+	copy: function (src,tar,deep,cb) {
 	/**
 	 * @method copy
 	 * @member ENUM
@@ -68,7 +69,6 @@ ENUM.prototype = {
 	 * 		} 
 	 * 
 	 */
-	copy: function (src,tar,deep,cb) {
 
 		for (var key in src) {
 			var val = src[key];
@@ -150,6 +150,7 @@ ENUM.prototype = {
 		return tar;
 	},
 	
+	each: function (src,cb) {
 	/**
 	 * @method each
 	 * @member ENUM
@@ -158,7 +159,6 @@ ENUM.prototype = {
 	 * 
 	 * Enumerate over source until optional callback(key,val,isLast) returns isEmpty.  Returns isEmpty.
 	 * */
-	each: function (src,cb) {
 
 		if  (src.constructor == Object) 
 			if ( cb ) {
@@ -224,6 +224,7 @@ ENUM.prototype = {
 			*/
 	},
 
+	extend: function (opts,methods) {
 	/**
 	 * @method extend
 	 * @member ENUM
@@ -233,7 +234,6 @@ ENUM.prototype = {
 	 * to push the function to the ENUM callStack (which can be drained by the ENUM flush
 	 * method).
 	 * */
-	extend: function (opts,methods) {
 	
 		if (methods) {
 			methods.each(function (n,method) {
@@ -246,12 +246,12 @@ ENUM.prototype = {
 			return this.copy(opts,this,"."); 
 	},
 
+	test: function (opts) {
 	/**
 	 * @method test
 	 * @member ENUM
 	 * Unit-test a module as documented in its config.js.
 	 * */
-	test: function (opts) {
 
 		var N = opts.N || process.argv[2];
 
@@ -286,13 +286,13 @@ ENUM.prototype = {
 		return this;
 	},
 
+	flush: function () {
 	/**
 	 * @method flush
 	 * @private
 	 * @member ENUM
 	 * Flush the ENUM call stack defined by the extend() Function keys.
 	 * */
-	flush: function () {
 
 		this.callStack.each( function (n,call) {
 			call();
@@ -302,12 +302,12 @@ ENUM.prototype = {
 
 };
 
+Array.prototype.each = 	function (cb) {
 /**
 @method each
 @member Array
 Enumerate through array until optional callback(idx, val, isLast) returns isEmpty.  Returns isEmpty.
 */
-Array.prototype.each = 	function (cb) {
 	var N=this.length, last=N-1;
 	
 	if (cb) 
@@ -318,6 +318,7 @@ Array.prototype.each = 	function (cb) {
 	
 }
 
+/*
 Array.prototype.joinify = 	function (sep,cb) {
 	
 	if (cb) {
@@ -331,50 +332,8 @@ Array.prototype.joinify = 	function (sep,cb) {
 	else
 		return this.join(sep);
 }
+*/
 
-module.exports = new ENUM({
-	String: [
-		/**
-		@method tag
-		@member String
-		*/
-		function tag(el,at) {
-
-			if ( el == "?" ) {  // tag a url
-				var rtn = this+"?";
-
-				for (var n in at) {
-					rtn += n + "=";
-					switch ( (at[n] || 0).constructor ) {
-						//case Array: rtn += at[n].join(",");	break;
-						case Array:
-						case Date:
-						case Object: rtn += JSON.stringify(at[n]); break;
-						default: rtn += at[n];
-					}
-					rtn += "&";
-				}
-				return rtn;				
-			}
-			else {  // tag html
-				var rtn = "<"+el+" ";
-
-				if (at)  
-					for (var n in at) rtn += n + "='" + at[n] + "' ";
-
-				switch (el) {
-					case "embed":
-					case "img":
-					case "link":
-					case "input":
-						return rtn+">" + this;
-					default:
-						return rtn+">" + this + "</"+el+">";
-				}
-			}
-		}
-		
-	]
-});
+module.exports = new ENUM();
 
 // UNCLASSIFIED
