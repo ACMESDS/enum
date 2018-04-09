@@ -155,9 +155,9 @@ ENUM.prototype = {
 	 * @method each
 	 * @member ENUM
 	 * @param {Object} src source hash
-	 * @param {Function} cb callback (idx,val) returning true or false
+	 * @param {Function} cb callback (idx,val, isLast) returns true or false to terminate
 	 * 
-	 * Enumerate over source until optional callback(key,val,isLast) returns isEmpty.  Returns isEmpty.
+	 * Enumerates src with optional callback cb(idx,val,isLast) and returns isEmpty.
 	 * */
 
 		if  (src.constructor == Object) 
@@ -188,43 +188,9 @@ ENUM.prototype = {
 			return last<0;
 		}
 			
-		/*
-		if (src)
-			switch (src.constructor) {
-				case String:
-
-					for (var n=0,N=src.length; n<N; n++) 
-						if (cb(n,src.charAt(n))) return true;
-
-					return false;
-
-				case Array:
-
-					for (var n=0,N = src.length;n<N;n++) 
-						if (cb(n,src[n])) return true;
-
-					return false;
-
-				case Object:
-
-					for (var n in src)  
-						if (cb(n,src[n])) return true;
-
-					return false;
-
-				default:
-
-					for (var n in src)  
-						if (src.hasOwnProperty(n)) 
-							if (cb(n,src[n])) return true;
-
-					return false;
-
-			}
-			*/
 	},
 
-	extend: function (opts,methods) {
+	extend: function (opts,protos) {
 	/**
 	 * @method extend
 	 * @member ENUM
@@ -235,25 +201,25 @@ ENUM.prototype = {
 	 * method).
 	 * */
 	
-		if (methods) {
-			methods.each(function (n,method) {
-				opts.prototype[method.name] = method;
+		if (protos) {
+			protos.each(function (n,proto) {
+				opts.prototype[proto.name] = proto;
 			});
 			return this;
 		}
-		else
+		
 		if (opts)
-			return this.copy(opts,this,"."); 
+			return this.copy(opts, this, "."); 
 	},
 
-	test: function (opts) {
+	test: function (N, opts) {
 	/**
 	 * @method test
 	 * @member ENUM
-	 * Unit-test a module as documented in its config.js.
+	 * Unit-test opts[N].
 	 * */
 
-		var N = opts.N || process.argv[2];
+		//var N = opts.N || process.argv[2];
 
 		if (N in opts)
 			if (typeof opts[N] == "function") {
@@ -317,22 +283,6 @@ Enumerate through array until optional callback(idx, val, isLast) returns isEmpt
 	return last<0;
 	
 }
-
-/*
-Array.prototype.joinify = 	function (sep,cb) {
-	
-	if (cb) {
-		var rtn = [];
-		this.each( function (n,rec) {
-			rtn.push( cb(rec) );
-		});
-		return rtn.join(sep);
-	}
-
-	else
-		return this.join(sep);
-}
-*/
 
 module.exports = new ENUM();
 

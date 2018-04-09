@@ -7,14 +7,13 @@
 	
 # ENUM
 
-ENUM provides a a common core of enumerators:
+ENUM provides a common set of enumerators:
 
-	test(opts,cb) 				// unit-tests a client by calling opts[ opts.N ] 
-	copy(src,tar,deep,cb)  // shallow/deep copy src to tar
-	each(opts,cb) 				// calls cb( n, opts[n] )
-	extend(opts) 				// adds opts to the enumerator
-	extend(src,methods) 	// extends src constructor with methods
-	flush() 						// calls all opts having a Function-key
+	test(N, opts) 				// unit-test the callback opts[ N ]()
+	copy(src,tar,deep,cb)  // shallow or deep copy src to tar with optional callback cb()
+	each(opts,cb) 				// enumerate opts with callback cb( n, opts[n], isLast )
+	extend(opts,protos)  // configure ENUM with options and prototypes
+	flush() 						// callback Function configuration opts
  
 where:
 
@@ -52,13 +51,13 @@ method).
 	
 + test() will unit-test a module as documented in its config.js.
 
-## Installation
+## Installing
 
 Clone from one of the repos. 
 	
-## Use
+## Using
 
-From, say, asm.js
+From some asm.js
 
 	var
 		ENUM = require("enum"),
@@ -72,7 +71,7 @@ From, say, asm.js
 			:
 		});
 
-then extended again from, say, nextasm.js
+then extended again from some nextasm.js
 
 	var 
 		ASM = require("asm"),
