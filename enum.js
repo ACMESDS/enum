@@ -160,7 +160,7 @@ ENUM.prototype = {
 	 * Enumerates src with optional callback cb(idx,val,isLast) and returns isEmpty.
 	 * */
 
-		if  (src.constructor == Object) 
+		// if  (src.constructor == Object) 
 			if ( cb ) {
 				var last = null; 
 
@@ -178,6 +178,7 @@ ENUM.prototype = {
 				return true;
 			}
 		
+		/*
 		else {
 			var keys = Object.keys(src), N=keys.length, last = N-1;
 			
@@ -186,7 +187,7 @@ ENUM.prototype = {
 					if ( cb( key=keys[n], src[key], n == last ) ) return true;
 			
 			return last<0;
-		}
+		} */
 			
 	},
 
@@ -202,7 +203,7 @@ ENUM.prototype = {
 	 * */
 	
 		if (protos) {
-			protos.each(function (n,proto) {
+			protos.forEach( function (proto) {
 				opts.prototype[proto.name] = proto;
 			});
 			return this;
@@ -274,6 +275,16 @@ Array.prototype.each = 	function (cb) {
 @member Array
 Enumerate through array until optional callback(idx, val, isLast) returns isEmpty.  Returns isEmpty.
 */
+	
+	if (cb) {
+		var last = this.length-1;
+		this.forEach( (val,idx) => cb( idx, this[idx], idx == last ) );
+	}
+	
+	else
+		return !this.length;
+	
+	/*
 	var N=this.length, last=N-1;
 	
 	if (cb) 
@@ -281,7 +292,7 @@ Enumerate through array until optional callback(idx, val, isLast) returns isEmpt
 			if ( cb(n, this[n], n == last) ) return true;
 		
 	return last<0;
-	
+	*/
 }
 
 module.exports = new ENUM();
