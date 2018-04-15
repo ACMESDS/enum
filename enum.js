@@ -1,13 +1,52 @@
 /// UNCLASSIFIED 
 
-function ENUM(opts) { 
-	if (opts) this.copy(opts,this,".");
-	this.callStack = [];
+Array.prototype.each = 	function (cb) {
+/**
+@method each
+@member Array
+Enumerate through array until optional callback(idx, val, isLast) returns isEmpty.  Returns isEmpty.
+*/
+	
+	if (cb) {
+		var last = this.length-1;
+		this.forEach( (val,idx) => cb( idx, this[idx], idx == last ) );
+	}
+	
+	else
+		return !this.length;
+	
+	/*
+	var N=this.length, last=N-1;
+	
+	if (cb) 
+		for (var n=0; n<N; n++) 
+			if ( cb(n, this[n], n == last) ) return true;
+		
+	return last<0;
+	*/
 }
 
-ENUM.prototype = {
-	trace: function (pre,msg,sql) {	
-		if (msg.constructor == String)
+Array.prototype.extend = function (con) {
+/**
+ * @method extend
+ * @member ENUM
+ * Extend the opts prototype with specified methods, or, if no methods are provided, 
+ * extend this ENUM with the given opts.  Array, String, Date, and Object keys are 
+ * interpretted to extend their respective prototypes.  A Function key is interpretted
+ * to push the function to the ENUM callStack (which can be drained by the ENUM flush
+ * method).
+ * */
+	this.forEach( function (proto) {
+		//console.log("ext", proto.name, con);
+		con.prototype[proto.name] = proto;
+	});
+}
+
+var ENUM = module.exports = {
+	String: [
+		function trace(pre,sql) {	
+			var msg = this+"";
+
 			if (sql) {
 				var 
 					parts = msg.split(" "),
@@ -26,17 +65,94 @@ ENUM.prototype = {
 					t: new Date(),
 					Client: client
 				});
-				
+
 				console.log(pre,msg);
 			}
 			else
 				console.log(pre,msg);
+		}
+	],	
 		
-		else
-			console.log(pre,msg);
+	Array: [ 
+		function sum(cb) {
+			for (var A=this, k= Sum = 0, K= A.length; k<K; k++) Sum+= A[k];
+
+			if (cb) cb(Sum,this);
+
+			return Sum;
+		},
+
+		function avg() {
+			return this.sum() / this.length;
+		},
+
+		function max() {
+			var A = this, Amax = -1e99, Aidx = 0;
+			A.use( (k) => {
+				if ( A[k] > Amax ) {
+					Amax = A[k];
+					Aidx = k;
+				}
+			});
+			return Amax;
+		},
+
+		function use(cb) {	// use vector A with callback cb(idx,A)
+			var A = this, N = A.length;
+
+			if (A.rows) {
+				var M = A.rows, N = A.columns;
+
+				for (var m=0; m<M; m++) for (var n=0, Am = A[m]; n<N; n++) cb(m,n,A,Am);
+				return A;
+			}
+
+			else
+				for (var n=0,N=A.length; n<N; n++) cb(n,A);
+
+			return A;
+		}	
+	],
+
+	Log: console.log,
+
+	Test: function (opts,N) {
+	/**
+	 * @method test
+	 * @member ENUM
+	 * Unit-test opts[N].
+	 * */
+
+		if (N in opts)
+			if (typeof opts[N] == "function") {
+				opts[N]();
+			}
+
+			else
+				console.log(`Test ${N} must be a function`);
+
+		else {
+			var tests = [];
+			for (var n in opts)
+				if (typeof opts[n] == "function")
+					if ( opts[n] != this[n] )
+						tests.push(n);
+
+			switch (tests.length) {
+				case 0: 
+					return console.log("No tests are available");
+				case 1:
+					return console.log(`Test ${tests} is available`);
+
+				default:						
+					console.log(`Configurations ${tests} are available`);
+			}
+		}
+
+		return this;
 	},
 	
-	copy: function (src,tar,deep,cb) {
+	Copy: (src,tar,deep,cb) => {
 	/**
 	 * @method copy
 	 * @member ENUM
@@ -69,43 +185,48 @@ ENUM.prototype = {
 	 * 		} 
 	 * 
 	 */
-
 		for (var key in src) {
 			var val = src[key];
 
-			if (deep)
+			if (deep) {
+				//Log("deep", key);
 				switch (key) {
 					case "Array": 
+						val.extend(Array);
+						/*
 						val.each(function (n,val) {
 							Array.prototype[val.name] = val; 
-						});
+						});*/
 
 						break;
 
 					case "String": 
-						val.each(function (n,val) {
+						val.extend(String);
+						/*val.each(function (n,val) {
 							String.prototype[val.name] = val; 
-						});
+						});*/
 
 						break;
 
 					case "Date": 
-						val.each(function (n,val) {
+						val.extend(Date);
+						/*val.each(function (n,val) {
 							Date.prototype[val.name] = val; 
-						});
+						});*/
 
 						break;
 
 					case "Object": 	
-						val.each(function (n,val) {
+						cal.extend(Object);
+						/*val.each(function (n,val) {
 							Object.prototype[val.name] = val; 
-						});
+						});*/
 
 						break;
 
 					case "Function": 
-						this.callStack.push( val ); 
-
+						/*this.callStack.push( val ); 
+						*/
 						break;
 
 					default:
@@ -138,7 +259,8 @@ ENUM.prototype = {
 							Tar[idx] = val;
 
 				}
-
+			}
+			
 			else
 			if (cb) 
 				tar[key] = cb( key, val);
@@ -149,8 +271,8 @@ ENUM.prototype = {
 
 		return tar;
 	},
-	
-	each: function (src,cb) {
+
+	Each: (src,cb) => {
 	/**
 	 * @method each
 	 * @member ENUM
@@ -159,142 +281,53 @@ ENUM.prototype = {
 	 * 
 	 * Enumerates src with optional callback cb(idx,val,isLast) and returns isEmpty.
 	 * */
+		var 
+			keys = Object.keys(src),
+			last = keys.length-1;
 
-		// if  (src.constructor == Object) 
-			if ( cb ) {
-				var last = null; 
+		if (cb)
+			keys.forEach( (key,idx) => cb(key, src[key], idx == last ) );
 
-				for (var key in src) last = key;
+		return keys.length==0;
 
-				if ( last && cb )
-					for (var key in src)  
-						if ( cb( key, src[key], key == last) ) return true;
+		/*		
+		if ( cb ) {
+			var last = null; 
 
-				return last == null;
-			}
-			
-			else {
-				for (var key in src) return false;
-				return true;
-			}
-		
-		/*
-		else {
-			var keys = Object.keys(src), N=keys.length, last = N-1;
-			
-			if ( cb )
-				for (var n=0; n<N; n++)  
-					if ( cb( key=keys[n], src[key], n == last ) ) return true;
-			
-			return last<0;
-		} */
-			
-	},
+			for (var key in src) last = key;
 
-	extend: function (opts,protos) {
-	/**
-	 * @method extend
-	 * @member ENUM
-	 * Extend the opts prototype with specified methods, or, if no methods are provided, 
-	 * extend this ENUM with the given opts.  Array, String, Date, and Object keys are 
-	 * interpretted to extend their respective prototypes.  A Function key is interpretted
-	 * to push the function to the ENUM callStack (which can be drained by the ENUM flush
-	 * method).
-	 * */
-	
-		if (protos) {
-			protos.forEach( function (proto) {
-				opts.prototype[proto.name] = proto;
-			});
-			return this;
-		}
-		
-		if (opts)
-			return this.copy(opts, this, "."); 
-	},
+			if ( last && cb )
+				for (var key in src)  
+					if ( cb( key, src[key], key == last) ) return true;
 
-	test: function (N, opts) {
-	/**
-	 * @method test
-	 * @member ENUM
-	 * Unit-test opts[N].
-	 * */
-
-		//var N = opts.N || process.argv[2];
-
-		if (N in opts)
-			if (typeof opts[N] == "function") {
-
-				opts[N]();
-
-			}
-			
-			else
-				console.log(`Test ${N} must be a function`);
-		
-		else {
-			var tests = [];
-			for (var n in opts)
-				if (typeof opts[n] == "function")
-					if ( opts[n] != this[n] )
-						tests.push(n);
-
-			switch (tests.length) {
-				case 0: 
-					return console.log("No tests are available");
-				case 1:
-					return console.log(`Test ${tests} is available`);
-
-				default:						
-					console.log(`Configurations ${tests} are available`);
-			}
+			return last == null;
 		}
 
-		return this;
+		else {
+			for (var key in src) return false;
+			return true;
+		}*/
 	},
 
-	flush: function () {
-	/**
-	 * @method flush
-	 * @private
-	 * @member ENUM
-	 * Flush the ENUM call stack defined by the extend() Function keys.
-	 * */
+	$$: (M,N,cb) => {  // create matrix A with callback cb(m,n,A,A[m])
+		var A = new Array(M);
 
-		this.callStack.each( function (n,call) {
-			call();
-		});
+		A.rows = M;
+		A.columns = N;
+		for (var m=0; m<M; m++) A[m] = new Array(N);
 
+		return cb ? A.use(A,cb) : A;
+	},
+	
+	$: (N,cb) => {  // create vector A with callback cb(idx,A)
+		var A = new Array(N);
+		return cb ? $use(A,cb) : A;
 	}
-
-};
-
-Array.prototype.each = 	function (cb) {
-/**
-@method each
-@member Array
-Enumerate through array until optional callback(idx, val, isLast) returns isEmpty.  Returns isEmpty.
-*/
-	
-	if (cb) {
-		var last = this.length-1;
-		this.forEach( (val,idx) => cb( idx, this[idx], idx == last ) );
-	}
-	
-	else
-		return !this.length;
-	
-	/*
-	var N=this.length, last=N-1;
-	
-	if (cb) 
-		for (var n=0; n<N; n++) 
-			if ( cb(n, this[n], n == last) ) return true;
-		
-	return last<0;
-	*/
 }
 
-module.exports = new ENUM();
+const {Copy, Log} = ENUM;
+
+ENUM.Array.extend(Array);
+ENUM.String.extend(String);
 
 // UNCLASSIFIED
