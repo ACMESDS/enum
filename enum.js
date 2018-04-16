@@ -43,77 +43,6 @@ Array.prototype.extend = function (con) {
 }
 
 var ENUM = module.exports = {
-	String: [
-		function trace(pre,sql) {	
-			var msg = this+"";
-
-			if (sql) {
-				var 
-					parts = msg.split(" "),
-					action = parts[0],
-					target = parts[1],
-					client = "";
-
-				parts.each( function (n,part) {
-					if ( part == "FOR" ) client = parts[n+1];
-				});
-
-				sql.query("INSERT INTO openv.syslogs SET ?", {
-					Action: action,
-					Target: target,
-					Module: pre,
-					t: new Date(),
-					Client: client
-				});
-
-				console.log(pre,msg);
-			}
-			else
-				console.log(pre,msg);
-		}
-	],	
-		
-	Array: [ 
-		function sum(cb) {
-			for (var A=this, k= Sum = 0, K= A.length; k<K; k++) Sum+= A[k];
-
-			if (cb) cb(Sum,this);
-
-			return Sum;
-		},
-
-		function avg() {
-			return this.sum() / this.length;
-		},
-
-		function max() {
-			var A = this, Amax = -1e99, Aidx = 0;
-			A.use( (k) => {
-				if ( A[k] > Amax ) {
-					Amax = A[k];
-					Aidx = k;
-				}
-			});
-			return Amax;
-		},
-
-		function use(cb) {	// use vector A with callback cb(idx,A)
-			var A = this, N = A.length;
-
-			if (A.rows) {
-				var M = A.rows, N = A.columns;
-
-				for (var m=0; m<M; m++) for (var n=0, Am = A[m]; n<N; n++) cb(m,n,A,Am);
-				return A;
-			}
-
-			else
-				for (var n=0,N=A.length; n<N; n++) cb(n,A);
-
-			return A;
-		}	
-	],
-
 	Log: console.log,
 
 	Test: function (opts,N) {
@@ -191,7 +120,7 @@ var ENUM = module.exports = {
 			if (deep) {
 				//Log("deep", key);
 				switch (key) {
-					case "Array": 
+					case Array: 
 						val.extend(Array);
 						/*
 						val.each(function (n,val) {
@@ -316,18 +245,86 @@ var ENUM = module.exports = {
 		A.columns = N;
 		for (var m=0; m<M; m++) A[m] = new Array(N);
 
-		return cb ? A.use(A,cb) : A;
+		return cb ? A.use(cb) : A;
 	},
 	
 	$: (N,cb) => {  // create vector A with callback cb(idx,A)
 		var A = new Array(N);
-		return cb ? $use(A,cb) : A;
+		return cb ? A.use(cb) : A;
 	}
 }
 
 const {Copy, Log} = ENUM;
 
-ENUM.Array.extend(Array);
-ENUM.String.extend(String);
+[ 
+	function sum(cb) {
+		for (var A=this, k= Sum = 0, K= A.length; k<K; k++) Sum+= A[k];
+
+		if (cb) cb(Sum,this);
+
+		return Sum;
+	},
+
+	function avg() {
+		return this.sum() / this.length;
+	},
+
+	function max() {
+		var A = this, Amax = -1e99, Aidx = 0;
+		A.use( (k) => {
+			if ( A[k] > Amax ) {
+				Amax = A[k];
+				Aidx = k;
+			}
+		});
+		return Amax;
+	},
+
+	function use(cb) {	// use vector A with callback cb(idx,A)
+		var A = this, N = A.length;
+
+		if (A.rows) {
+			var M = A.rows, N = A.columns;
+
+			for (var m=0; m<M; m++) for (var n=0, Am = A[m]; n<N; n++) cb(m,n,A,Am);
+			return A;
+		}
+
+		else
+			for (var n=0,N=A.length; n<N; n++) cb(n,A);
+
+		return A;
+	}	
+].extend(Array);
+
+[
+	function trace(pre,sql) {	
+		var msg = this+"";
+
+		if (sql) {
+			var 
+				parts = msg.split(" "),
+				action = parts[0],
+				target = parts[1],
+				client = "";
+
+			parts.each( function (n,part) {
+				if ( part == "FOR" ) client = parts[n+1];
+			});
+
+			sql.query("INSERT INTO openv.syslogs SET ?", {
+				Action: action,
+				Target: target,
+				Module: pre,
+				t: new Date(),
+				Client: client
+			});
+
+			console.log(pre,msg);
+		}
+		else
+			console.log(pre,msg);
+	}
+].extend(String);
 
 // UNCLASSIFIED
