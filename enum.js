@@ -13,17 +13,7 @@ Enumerate through array until optional callback(idx, val, isLast) returns isEmpt
 	}
 	
 	else
-		return !this.length;
-	
-	/*
-	var N=this.length, last=N-1;
-	
-	if (cb) 
-		for (var n=0; n<N; n++) 
-			if ( cb(n, this[n], n == last) ) return true;
-		
-	return last<0;
-	*/
+		return !this.length;	
 }
 
 Array.prototype.extend = function (con) {
@@ -236,66 +226,11 @@ var ENUM = module.exports = {
 			for (var key in src) return false;
 			return true;
 		}*/
-	},
-
-	$$: (M,N,cb) => {  // create matrix A with callback cb(m,n,A,A[m])
-		var A = new Array(M);
-
-		A.rows = M;
-		A.columns = N;
-		for (var m=0; m<M; m++) A[m] = new Array(N);
-
-		return cb ? A.use(cb) : A;
-	},
-	
-	$: (N,cb) => {  // create vector A with callback cb(idx,A)
-		var A = new Array(N);
-		return cb ? A.use(cb) : A;
 	}
+
 }
 
 const {Copy, Log} = ENUM;
-
-[ 
-	function sum(cb) {
-		for (var A=this, k= Sum = 0, K= A.length; k<K; k++) Sum+= A[k];
-
-		if (cb) cb(Sum,this);
-
-		return Sum;
-	},
-
-	function avg() {
-		return this.sum() / this.length;
-	},
-
-	function max() {
-		var A = this, Amax = -1e99, Aidx = 0;
-		A.use( (k) => {
-			if ( A[k] > Amax ) {
-				Amax = A[k];
-				Aidx = k;
-			}
-		});
-		return Amax;
-	},
-
-	function use(cb) {	// use vector A with callback cb(idx,A)
-		var A = this, N = A.length;
-
-		if (A.rows) {
-			var M = A.rows, N = A.columns;
-
-			for (var m=0; m<M; m++) for (var n=0, Am = A[m]; n<N; n++) cb(m,n,A,Am);
-			return A;
-		}
-
-		else
-			for (var n=0,N=A.length; n<N; n++) cb(n,A);
-
-		return A;
-	}	
-].extend(Array);
 
 [
 	function trace(pre,sql) {	
