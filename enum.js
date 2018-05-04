@@ -22,9 +22,7 @@ Array.prototype.extend = function (con) {
  * @member ENUM
  * Extend the opts prototype with specified methods, or, if no methods are provided, 
  * extend this ENUM with the given opts.  Array, String, Date, and Object keys are 
- * interpretted to extend their respective prototypes.  A Function key is interpretted
- * to push the function to the ENUM callStack (which can be drained by the ENUM flush
- * method).
+ * interpretted to extend their respective prototypes.  
  * */
 	this.forEach( function (proto) {
 		//console.log("ext", proto.name, con);
@@ -97,10 +95,8 @@ var ENUM = module.exports = {
 	 * 			OBJECT: [ 			// prototype OBJECT (Array,String,Date,Object) = method X,Y, ...
 	 * 				function X() {}, 
 	 * 				function Y() {}, 
-	 * 			... ],
+	 * 			... ]
 	 * 
-	 * 			Function: 			// append method X to ENUM callback stack
-	 * 				function X() {}
 	 * 		} 
 	 * 
 	 */
@@ -143,10 +139,9 @@ var ENUM = module.exports = {
 
 						break;
 
-					case "Function": 
-						/*this.callStack.push( val ); 
-						*/
-						break;
+					/*case "Function": 
+						this.callStack.push( val ); 
+						break; */
 
 					default:
 
