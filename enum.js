@@ -69,36 +69,35 @@ var ENUM = module.exports = {
 		return this;
 	}, */
 	
-	Copy: (src,tar,deep,cb) => {
+	Copy: (src,tar,deep) => {
 	/**
-	 * @method copy
-	 * @member ENUM
-	 * @param {Object} src source hash
-	 * @param {Object} tar target hash
-	 * @param {String} deep copy key deliminator
-	 * @param {Function} cb callback(idx,val) returns true to drop
-	 * @return {Object} target hash
-	 * 
-	 * Copy source hash to target hash under supervision of optional callback. 
-	 * If a deep key deliminator (e.g. ".") is specified, the copy is deep where src 
-	 * keys are treated as keys into the target thusly:
-	 * 
-	 * 		{	
-	 * 			A: value,			// sets target[A] = value
-	 * 
-	 * 			"A.B.C": value, 	// sets target[A][B][C] = value
-	 * 
-	 * 			"A.B.C.": {			// appends X,Y to target[A][B][C]
-	 * 				X:value, Y:value, ...
-	 * 			},	
-	 * 
-	 * 			OBJECT: [ 			// prototype OBJECT (Array,String,Date,Object) = method X,Y, ...
-	 * 				function X() {}, 
-	 * 				function Y() {}, 
-	 * 			... ]
-	 * 
-	 * 		} 
-	 * 
+	 @method copy
+	 @member ENUM
+	 @param {Object} src source hash
+	 @param {Object} tar target hash
+	 @param {String} deep copy key 
+	 @return {Object} target hash
+	 
+	 Copy source hash to target hash under supervision of optional callback. 
+	 If a deep key deliminator (e.g. ".") is specified.  If a deep key delimininator is 
+	 provided, src  keys are treated as keys into the target thusly:
+	 
+	 		{	
+	 			A: value,			// sets target[A] = value
+	 
+	 			"A.B.C": value, 	// sets target[A][B][C] = value
+	 
+	 			"A.B.C.": {			// appends X,Y to target[A][B][C]
+	 				X:value, Y:value, ...
+	 			},	
+	 
+	 			OBJECT: [ 			// prototype OBJECT (Array,String,Date,Object) = method X,Y, ...
+	 				function X() {}, 
+	 				function Y() {}, 
+	 			... ]
+	 
+	 		} 
+	 
 	 */
 		for (var key in src) {
 			var val = src[key];
@@ -132,34 +131,39 @@ var ENUM = module.exports = {
 
 						for (var n=0,N=keys.length-1,idx=keys[0] ; 
 								n<N && idx ; 
-								idx=keys[++n]	) 	Tar = Tar[idx];
+								idx=keys[++n]	) 	
+								
+							if ( idx in Tar ) 
+								Tar = Tar[idx];
+							else
+								Tar = Tar[idx] = new Array();
 
-						if (cb && cb(key,val)) {
+						/*if (cb && cb(key,val)) {
 							var x=1;
-						}
+						}*/
 
-						else
+						/*else
 						if (!Tar)
-							throw new Error(`no copy target "${keys}"`);
+							throw new Error(`no copy target "${keys}"`);  
 
-						else
-						if (idx)
+						else */
+						if (idx)  // set target
 							Tar[idx] = val;
 
-						else
+						else	// append to target
 						if (val.constructor == Object) 
 							for (var n in val) 
 								Tar[n] = val[n];
 
 						else
-							Tar[idx] = val;
+							Tar.push( val );
 
 				}
 			}
 			
-			else
+			/*else
 			if (cb) 
-				tar[key] = cb( key, val);
+				tar[key] = cb( key, val);  */
 
 			else
 				tar[key] = val;
@@ -205,72 +209,64 @@ var ENUM = module.exports = {
 		}*/
 	}
 
-}
+};
 
-const {Copy, Log} = ENUM;
+const {Each, Copy, Log} = ENUM;
 
-[
-	function trace(msg,sql) {	
-		var pre = this+"";
-
-		if (sql) {
-			var 
-				parts = msg.split(" "),
-				action = parts[0],
-				target = parts[1],
-				client = "";
-
-			parts.each( function (n,part) {
-				if ( part == "FOR" ) client = parts[n+1];
-			});
-
-			sql.query("INSERT INTO openv.syslogs SET ?", {
-				Action: action,
-				Target: target,
-				Module: pre,
-				t: new Date(),
-				Client: client
-			});
-
-			console.log(pre,msg);
-		}
-		else
-			console.log(pre,msg);
-	}
-].extend(String);
-
-[ 
-
-	function Copy(tar, dot, cb) {
+[	
+	function joinify(cb) {
 	/*
-		[a, g1.b, g1.c, g1.g2.f, g1.g2.e, g3.x, g3.y]
-		--> { 
-			a: null,
-			"g1.": [b,c],
-			"g1.g2.": [f,e]
+	Joins a list 
+		[	a: null,
+			g1: [ b: null, c: null, g2: [ x: null ] ],
+			g3: [ y: null ] ].joinify()
+	
+	into a string
+		"a,g1(b,c,g2(x)),g3(y)"
 			
-		--> [a, {g1: [b,c, g2:[f,e]}, g3: [x,y] ]
-		--> "a,g1(b,c, g2(d,e)), g3(x,y)"								
+	A callback cb(head,list) can be provided to join the current list with the current head.
+	*/
+
+		var 
+			src = this,
+			rtn = [];
+		
+		Each(src, (key, list) => {
+			if ( typeof list == "string" ) 
+				rtn.push( list );
+			
+			else
+				try {
+					rtn.push( cb 
+						? cb( key, list ) 
+						: key + "(" + list.joinify() + ")" 
+					);
+				}
+				catch (err) {
+					rtn.push(list);
+				}
+		});
+		
+		return cb ? cb(null,rtn) : rtn.join(",");
+	},
+
+	function splitify(dot) {
+	/*
+	Splits a list 
+		["a", "g1.b", "g1.c", "g1.g2.x", "g3.y"].splitify( "." )
+		
+	into a list
+		 [	a: null,
+			g1: [ b: null, c: null, g2: [ x: null ] ],
+			g3: [ y: null ] ]
+	
 	*/
 		var src = {};
-		
 		this.forEach( (key) => {
-			var 
-				keys = key.split(dot),
-				tail = keys.pop(),
-				index = keys.join(dot)+dot,
-				list = src[index];
-
-			if ( !list ) list = src[index] = [];
-			
-			list.push(tail);
-			
-			srcKey.split(dot).forEach( (key,idx) => {			
-				if (idx == grp.length-1) {
-					var set = src[grp+
-					if (set[grp+dot] = [];
-				
-		});
+			src[key] = key;
+		}); 
+		
+		return Copy(src,[],dot || ".");
 	}
 ].extend(Array);
 
