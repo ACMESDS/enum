@@ -33,12 +33,12 @@ Array.prototype.extend = function (con) {
 var ENUM = module.exports = {
 	Log: console.log,
 
-	Test: function (opts,N) {
-	/**
+	/*Test: function (opts,N) {
+	/* *
 	 * @method test
 	 * @member ENUM
 	 * Unit-test opts[N].
-	 * */
+	 * * /
 
 		if (N in opts)
 			if (typeof opts[N] == "function") {
@@ -67,7 +67,7 @@ var ENUM = module.exports = {
 		}
 
 		return this;
-	},
+	}, */
 	
 	Copy: (src,tar,deep,cb) => {
 	/**
@@ -228,8 +228,8 @@ var ENUM = module.exports = {
 const {Copy, Log} = ENUM;
 
 [
-	function trace(pre,sql) {	
-		var msg = this+"";
+	function trace(msg,sql) {	
+		var pre = this+"";
 
 		if (sql) {
 			var 
