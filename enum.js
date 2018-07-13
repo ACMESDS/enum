@@ -108,35 +108,18 @@ var ENUM = module.exports = {
 				switch (key) {
 					case Array: 
 						val.extend(Array);
-						/*
-						val.each(function (n,val) {
-							Array.prototype[val.name] = val; 
-						});*/
-
 						break;
 
 					case "String": 
 						val.extend(String);
-						/*val.each(function (n,val) {
-							String.prototype[val.name] = val; 
-						});*/
-
 						break;
 
 					case "Date": 
 						val.extend(Date);
-						/*val.each(function (n,val) {
-							Date.prototype[val.name] = val; 
-						});*/
-
 						break;
 
 					case "Object": 	
 						cal.extend(Object);
-						/*val.each(function (n,val) {
-							Object.prototype[val.name] = val; 
-						});*/
-
 						break;
 
 					/*case "Function": 
@@ -150,7 +133,6 @@ var ENUM = module.exports = {
 						for (var n=0,N=keys.length-1,idx=keys[0] ; 
 								n<N && idx ; 
 								idx=keys[++n]	) 	Tar = Tar[idx];
-
 
 						if (cb && cb(key,val)) {
 							var x=1;
@@ -256,5 +238,40 @@ const {Copy, Log} = ENUM;
 			console.log(pre,msg);
 	}
 ].extend(String);
+
+[ 
+
+	function Copy(tar, dot, cb) {
+	/*
+		[a, g1.b, g1.c, g1.g2.f, g1.g2.e, g3.x, g3.y]
+		--> { 
+			a: null,
+			"g1.": [b,c],
+			"g1.g2.": [f,e]
+			
+		--> [a, {g1: [b,c, g2:[f,e]}, g3: [x,y] ]
+		--> "a,g1(b,c, g2(d,e)), g3(x,y)"								
+	*/
+		var src = {};
+		
+		this.forEach( (key) => {
+			var 
+				keys = key.split(dot),
+				tail = keys.pop(),
+				index = keys.join(dot)+dot,
+				list = src[index];
+
+			if ( !list ) list = src[index] = [];
+			
+			list.push(tail);
+			
+			srcKey.split(dot).forEach( (key,idx) => {			
+				if (idx == grp.length-1) {
+					var set = src[grp+
+					if (set[grp+dot] = [];
+				
+		});
+	}
+].extend(Array);
 
 // UNCLASSIFIED
