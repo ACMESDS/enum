@@ -33,42 +33,6 @@ Array.prototype.extend = function (con) {
 var ENUM = module.exports = {
 	Log: console.log,
 
-	/*Test: function (opts,N) {
-	/* *
-	 * @method test
-	 * @member ENUM
-	 * Unit-test opts[N].
-	 * * /
-
-		if (N in opts)
-			if (typeof opts[N] == "function") {
-				opts[N]();
-			}
-
-			else
-				console.log(`Test ${N} must be a function`);
-
-		else {
-			var tests = [];
-			for (var n in opts)
-				if (typeof opts[n] == "function")
-					if ( opts[n] != this[n] )
-						tests.push(n);
-
-			switch (tests.length) {
-				case 0: 
-					return console.log("No tests are available");
-				case 1:
-					return console.log(`Test ${tests} is available`);
-
-				default:						
-					console.log(`Configurations ${tests} are available`);
-			}
-		}
-
-		return this;
-	}, */
-	
 	Copy: (src,tar,deep) => {
 	/**
 	 @method copy
@@ -118,7 +82,7 @@ var ENUM = module.exports = {
 						break;
 
 					case "Object": 	
-						cal.extend(Object);
+						val.extend(Object);
 						break;
 
 					/*case "Function": 
@@ -127,30 +91,25 @@ var ENUM = module.exports = {
 
 					default:
 
-						var keys = key.split(deep), Tar=tar;
-
-						for (var n=0,N=keys.length-1,idx=keys[0] ; 
-								n<N && idx ; 
-								idx=keys[++n]	) 	
+						var 
+							keys = key.split(deep), 
+							Tar = tar,
+							idx = keys[0];
+						
+						for (  // index to the element to set/append
+								var n=0,N=keys.length-1 ; 
+								n < N ; 
+								idx = keys[++n]	) 	
 								
 							if ( idx in Tar ) 
 								Tar = Tar[idx];
 							else
 								Tar = Tar[idx] = new Array();
 
-						/*if (cb && cb(key,val)) {
-							var x=1;
-						}*/
-
-						/*else
-						if (!Tar)
-							throw new Error(`no copy target "${keys}"`);  
-
-						else */
 						if (idx)  // set target
 							Tar[idx] = val;
 
-						else	// append to target
+						else  // append to target
 						if (val.constructor == Object) 
 							for (var n in val) 
 								Tar[n] = val[n];
@@ -158,13 +117,30 @@ var ENUM = module.exports = {
 						else
 							Tar.push( val );
 
+						/*
+						for (var n=0,N=keys.length-1,idx=keys[0] ; 
+								n < N && idx ; 
+								idx = keys[++n]	) 	
+								
+							if ( idx in Tar ) 
+								Tar = Tar[idx];
+							else
+								Tar = Tar[idx] = new Array();
+
+						if (idx)  // set target
+							Tar[idx] = val;
+
+						else  // append to target
+						if (val.constructor == Object) 
+							for (var n in val) 
+								Tar[n] = val[n];
+
+						else
+							Tar.push( val );
+					*/
 				}
 			}
 			
-			/*else
-			if (cb) 
-				tar[key] = cb( key, val);  */
-
 			else
 				tar[key] = val;
 		}
@@ -214,60 +190,6 @@ var ENUM = module.exports = {
 const {Each, Copy, Log} = ENUM;
 
 [	
-	function joinify(cb) {
-	/*
-	Joins a list 
-		[	a: null,
-			g1: [ b: null, c: null, g2: [ x: null ] ],
-			g3: [ y: null ] ].joinify()
-	
-	into a string
-		"a,g1(b,c,g2(x)),g3(y)"
-			
-	A callback cb(head,list) can be provided to join the current list with the current head.
-	*/
-
-		var 
-			src = this,
-			rtn = [];
-		
-		Each(src, (key, list) => {
-			if ( typeof list == "string" ) 
-				rtn.push( list );
-			
-			else
-				try {
-					rtn.push( cb 
-						? cb( key, list ) 
-						: key + "(" + list.joinify() + ")" 
-					);
-				}
-				catch (err) {
-					rtn.push(list);
-				}
-		});
-		
-		return cb ? cb(null,rtn) : rtn.join(",");
-	},
-
-	function splitify(dot) {
-	/*
-	Splits a list 
-		["a", "g1.b", "g1.c", "g1.g2.x", "g3.y"].splitify( "." )
-		
-	into a list
-		 [	a: null,
-			g1: [ b: null, c: null, g2: [ x: null ] ],
-			g3: [ y: null ] ]
-	
-	*/
-		var src = {};
-		this.forEach( (key) => {
-			src[key] = key;
-		}); 
-		
-		return Copy(src,[],dot || ".");
-	}
 ].extend(Array);
 
 // UNCLASSIFIED
