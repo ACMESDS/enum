@@ -30,29 +30,6 @@ Array.prototype.extend = function (con) {
 	});
 }
 
-Array.prototype.serialize = function (fetcher, urlkey, cb) {
-	function fetchInfo(rec, url, cb) {
-		fetcher(url , (info) => cb(rec, info) );
-	}
-
-	var got = 0, fails = 0, recs = this;
-
-	if ( toget = recs.length )
-		recs.forEach( (rec,idx) => {
-			fetchInfo( rec, rec[urlkey], (rec, users) => {
-				if (users) 
-					cb( rec, users );
-				else
-					fails++;
-
-				if (++got == toget) cb( null, fails );
-			});
-		});
-
-	else
-		cb( null, fails);
-}
-	
 var ENUM = module.exports = {
 	Log: console.log,
 
@@ -213,6 +190,82 @@ var ENUM = module.exports = {
 const {Each, Copy, Log} = ENUM;
 
 [	
+	function serialize(fetcher, key, cb) {  //< callback cb(rec,info) or cb(null,fails) using an async fetcher( url, (info) => {} ) where url = rec[key]
+		function fetchInfo(rec, url, cb) {  
+			fetcher(url , (info) => cb(rec, info) );
+		}
+
+		var fetched = 0, fails = 0, recs = this;
+
+		if ( fetches = recs.length ) // number of records to be fetched
+			recs.forEach( (rec,idx) => {  // fetch each record
+				fetchInfo( rec, rec[key], (rec, info) => {  // get info for callback
+					if (info)   
+						cb( rec, info );  // fetch worked so feed callback
+					
+					else  // fetch failed
+						fails++;
+
+					if (++fetched == fetches) cb( null, fails );  // fetches exhausted so we are done
+				});
+			});
+
+		else  // no records so we are done
+			cb( null, fails);
+	}
 ].extend(Array);
+
+[
+	/*
+	function serialize( fetcher, regex, key, cb ) {
+		
+		var 
+			fetches = [],
+			parses = 0,
+			fails = 0,
+			results = this.replace(new RegExp(regex, "g"), (str, url) => {   // /<!---fetch ([^>]*)?--->/g
+				//Log("fetch scan", parses);
+
+				fetcher( url, ( info ) => {
+					if ( info )
+						fetches.push( info );
+					
+					else
+						fails++;
+
+					//Log("fetch", fetches.length, parses);
+
+					if ( fetches.length == parses ) {  // all expressions parsed so we are done
+						fetches.forEach( (sub, idx) => {	// substitute fecthed results at key tokens
+							results = results.replace(key+idx, sub);
+						});
+						cb( results, fails );
+					}
+				});
+				return key+(parses++);
+			});
+		
+		//Log("#fetched found=", parses, results);
+		if ( !parses ) cb(results, fails);
+	} */
+	function serialize( fetcher, regex, key, cb ) {
+		var 
+			recs = [],
+			results = this.replace(new RegExp(regex, "g"), (str, url) => {
+				recs.push( new Object( {idx: recs.length, url: url} ) );
+				return key+(recs.length-1);
+			});
+
+		recs.serialize( fetcher, "url", (rec,info) => {
+			if (rec) 
+				results = results.replace(key+rec.idx, info);
+			
+			else
+				cb( results );
+		});
+
+	}
+	
+].extend(String);
 
 // UNCLASSIFIED
