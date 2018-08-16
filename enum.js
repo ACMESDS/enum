@@ -30,6 +30,29 @@ Array.prototype.extend = function (con) {
 	});
 }
 
+Array.prototype.serialize = function (fetcher, urlkey, cb) {
+	function fetchInfo(rec, url, cb) {
+		fetcher(url , (info) => cb(rec, info) );
+	}
+
+	var got = 0, fails = 0, recs = this;
+
+	if ( toget = recs.length )
+		recs.forEach( (rec,idx) => {
+			fetchInfo( rec, rec[urlkey], (rec, users) => {
+				if (users) 
+					cb( rec, users );
+				else
+					fails++;
+
+				if (++got == toget) cb( null, fails );
+			});
+		});
+
+	else
+		cb( null, fails);
+}
+	
 var ENUM = module.exports = {
 	Log: console.log,
 
