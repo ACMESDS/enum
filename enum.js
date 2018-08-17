@@ -190,18 +190,18 @@ var ENUM = module.exports = {
 const {Each, Copy, Log} = ENUM;
 
 [	
-	function serialize(fetcher, key, cb) {  //< callback cb(rec,info) or cb(null,fails) using an async fetcher( url, (info) => {} ) where url = rec[key]
-		function fetchInfo(rec, url, cb) {  
-			fetcher(url , (info) => cb(rec, info) );
+	function serialize(fetch, cb) {  //< callback cb(rec,info) or cb(null,fails) given an info fetcher fetch( rec, (info) => )
+		function fetchInfo(rec, cb) {  
+			fetch(rec , (info) => cb(rec, info) );
 		}
 
 		var fetched = 0, fails = 0, recs = this;
 
 		if ( fetches = recs.length ) // number of records to be fetched
-			recs.forEach( (rec,idx) => {  // fetch each record
-				fetchInfo( rec, rec[key], (rec, info) => {  // get info for callback
-					if (info)   
-						cb( rec, info );  // fetch worked so feed callback
+			recs.forEach( (rec,idx) => {  // fetch results for each record
+				fetchInfo( rec, (rec, results) => {  // process results
+					if (results)   // fetch worked so feed results to callback
+						cb( rec, results );  
 					
 					else  // fetch failed
 						fails++;
@@ -248,7 +248,7 @@ const {Each, Copy, Log} = ENUM;
 		//Log("#fetched found=", parses, results);
 		if ( !parses ) cb(results, fails);
 	} */
-	function serialize( fetcher, regex, key, cb ) {
+	function serialize( fetch, regex, key, cb ) {
 		var 
 			recs = [],
 			results = this.replace(new RegExp(regex, "g"), (str, url) => {
@@ -256,7 +256,7 @@ const {Each, Copy, Log} = ENUM;
 				return key+(recs.length-1);
 			});
 
-		recs.serialize( fetcher, "url", (rec,info) => {
+		recs.serialize( fetch, (rec,info) => {
 			if (rec) 
 				results = results.replace(key+rec.idx, info);
 			
