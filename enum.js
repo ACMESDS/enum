@@ -116,28 +116,6 @@ var ENUM = module.exports = {
 
 						else
 							Tar.push( val );
-
-						/*
-						for (var n=0,N=keys.length-1,idx=keys[0] ; 
-								n < N && idx ; 
-								idx = keys[++n]	) 	
-								
-							if ( idx in Tar ) 
-								Tar = Tar[idx];
-							else
-								Tar = Tar[idx] = new Array();
-
-						if (idx)  // set target
-							Tar[idx] = val;
-
-						else  // append to target
-						if (val.constructor == Object) 
-							for (var n in val) 
-								Tar[n] = val[n];
-
-						else
-							Tar.push( val );
-					*/
 				}
 			}
 			
@@ -165,24 +143,6 @@ var ENUM = module.exports = {
 			keys.forEach( (key,idx) => cb(key, src[key], idx == last ) );
 
 		return keys.length==0;
-
-		/*		
-		if ( cb ) {
-			var last = null; 
-
-			for (var key in src) last = key;
-
-			if ( last && cb )
-				for (var key in src)  
-					if ( cb( key, src[key], key == last) ) return true;
-
-			return last == null;
-		}
-
-		else {
-			for (var key in src) return false;
-			return true;
-		}*/
 	}
 
 };
@@ -195,17 +155,17 @@ const {Each, Copy, Log} = ENUM;
 			fetch(rec , (info) => cb(rec, info) );
 		}
 
-		var fetched = 0, fails = 0, recs = this;
+		var fetched = 0, fails = 0, recs = this, fetches = recs.length;
 
-		if ( fetches = recs.length ) // number of records to be fetched
+		if ( fetches ) // number of records to be fetched
 			recs.forEach( (rec,idx) => {  // fetch results for each record
 				fetchInfo( rec, (rec, results) => {  // process results
-					if (results)   // fetch worked so feed results to callback
-						cb( rec, results );  
-					
-					else  // fetch failed
-						fails++;
+					cb( rec, results );   // feed results to callback
 
+					if ( !results) fails++;
+
+					//Log( cb.name||"?", fetched, fetches, fails);
+					
 					if (++fetched == fetches) cb( null, fails );  // fetches exhausted so we are done
 				});
 			});
@@ -216,38 +176,6 @@ const {Each, Copy, Log} = ENUM;
 ].extend(Array);
 
 [
-	/*
-	function serialize( fetcher, regex, key, cb ) {
-		
-		var 
-			fetches = [],
-			parses = 0,
-			fails = 0,
-			results = this.replace(new RegExp(regex, "g"), (str, url) => {   // /<!---fetch ([^>]*)?--->/g
-				//Log("fetch scan", parses);
-
-				fetcher( url, ( info ) => {
-					if ( info )
-						fetches.push( info );
-					
-					else
-						fails++;
-
-					//Log("fetch", fetches.length, parses);
-
-					if ( fetches.length == parses ) {  // all expressions parsed so we are done
-						fetches.forEach( (sub, idx) => {	// substitute fecthed results at key tokens
-							results = results.replace(key+idx, sub);
-						});
-						cb( results, fails );
-					}
-				});
-				return key+(parses++);
-			});
-		
-		//Log("#fetched found=", parses, results);
-		if ( !parses ) cb(results, fails);
-	} */
 	function serialize( fetch, regex, key, cb ) {
 		var 
 			recs = [],
