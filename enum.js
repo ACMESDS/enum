@@ -42,9 +42,8 @@ var ENUM = module.exports = {
 	 @param {String} deep copy key 
 	 @return {Object} target hash
 	 
-	 Copy source hash to target hash under supervision of optional callback. 
-	 If a deep key deliminator (e.g. ".") is specified.  If a deep key delimininator is 
-	 provided, src  keys are treated as keys into the target thusly:
+	 Copy source hash to target hash; thus Copy({...}, {}) is equivalent to new Object({...}).
+	 If a deep deliminator (e.g. ".") is provided, src  keys are treated as keys into the target thusly:
 	 
 	 		{	
 	 			A: value,			// sets target[A] = value
@@ -66,8 +65,7 @@ var ENUM = module.exports = {
 		for (var key in src) {
 			var val = src[key];
 
-			if (deep) {
-				//Log("deep", key);
+			if (deep) 
 				switch (key) {
 					case Array: 
 						val.extend(Array);
@@ -117,7 +115,6 @@ var ENUM = module.exports = {
 						else
 							Tar.push( val );
 				}
-			}
 			
 			else
 				tar[key] = val;
@@ -150,9 +147,9 @@ var ENUM = module.exports = {
 const {Each, Copy, Log} = ENUM;
 
 [	
-	function serialize(fetch, cb) {  //< callback cb(rec,info) or cb(null,fails) given an info fetcher fetch( rec, (info) => )
+	function serialize(fetcher, cb) {  //< callback cb(rec,info) or cb(null,fails) when complete, given a fetcher( rec, (info) => {...})
 		function fetchInfo(rec, cb) {  
-			fetch(rec , (info) => cb(rec, info) );
+			fetcher(rec , (info) => cb(rec, info) );
 		}
 
 		var fetched = 0, fails = 0, recs = this, fetches = recs.length;
@@ -164,8 +161,6 @@ const {Each, Copy, Log} = ENUM;
 
 					if ( !results) fails++;
 
-					//Log( cb.name||"?", fetched, fetches, fails);
-					
 					if (++fetched == fetches) cb( null, fails );  // fetches exhausted so we are done
 				});
 			});
@@ -176,15 +171,15 @@ const {Each, Copy, Log} = ENUM;
 ].extend(Array);
 
 [
-	function serialize( fetch, regex, key, cb ) {
+	function serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing every regex using fetcher( rec, (ex) => "replace" )
 		var 
 			recs = [],
-			results = this.replace(new RegExp(regex, "g"), (str, url) => {
-				recs.push( new Object( {idx: recs.length, url: url} ) );
+			results = this.replace(new RegExp(regex, "g"), (str, url, opt) => {
+				recs.push( new Object( {idx: recs.length, url: url, opt:opt} ) );
 				return key+(recs.length-1);
 			});
 
-		recs.serialize( fetch, (rec,info) => {
+		recs.serialize( fetcher, (rec,info) => {
 			if (rec) 
 				results = results.replace(key+rec.idx, info);
 			
