@@ -171,6 +171,34 @@ const {Each, Copy, Log} = ENUM;
 ].extend(Array);
 
 [
+	function trace(msg,sql) {	
+		var pre = this+"";
+
+		if (sql) {
+			var 
+				parts = msg.split(" "),
+				action = parts[0],
+				target = parts[1],
+				client = "";
+
+			parts.each( function (n,part) {
+				if ( part == "FOR" ) client = parts[n+1];
+			});
+
+			sql.query("INSERT INTO openv.syslogs SET ?", {
+				Action: action,
+				Target: target,
+				Module: pre,
+				t: new Date(),
+				Client: client
+			});
+
+			console.log(pre,msg);
+		}
+		else
+			console.log(pre,msg);
+	},
+		
 	function serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing every regex using fetcher( rec, (ex) => "replace" )
 		var 
 			recs = [],
