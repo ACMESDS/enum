@@ -197,6 +197,11 @@ const {Each, Copy, Log} = ENUM;
 					sql.query(log, info);
 					break;
 
+				case "sendfile": 
+					info.target = info.target.split(".").pop();
+					sql.query(log, info);
+					break;
+					
 				default:
 
 					if ( token.startsWith("db") ) {
