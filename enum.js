@@ -172,31 +172,54 @@ const {Each, Copy, Log} = ENUM;
 
 [
 	function trace(msg,sql) {	
-		var pre = this+"";
+		console.log(this+"",msg);
 
 		if (sql) {
 			var 
-				parts = msg.split(" "),
-				action = parts[0],
-				target = parts[1],
-				client = "";
-
-			parts.each( function (n,part) {
-				if ( part == "FOR" ) client = parts[n+1];
+				log = "INSERT INTO openv.syslogs SET ? ON DUPLICATE KEY UPDATE Count=Count+1",
+				tokens = msg.toLowerCase().split(" "),
+				info = {action: tokens[0], target: tokens[1], module: this+"", t: new Date(), on: "", for: ""};
+			
+			tokens.forEach( (token, idx) => {
+				if ( idx ) 
+					if ( idx % 2 == 0 )
+						if ( token in info )
+							info[token] = tokens[idx+1];
 			});
+			
+			switch ( token = tokens[0] ) {
+				case "select":
+				case "update":
+				case "insert":
+				case "delete":
+					info.action = "sql";
+					info.target = "dataset";
+					sql.query(log, info);
+					break;
 
-			sql.query("INSERT INTO openv.syslogs SET ?", {
-				Action: action,
-				Target: target,
-				Module: pre,
-				t: new Date(),
-				Client: client
-			});
+				default:
 
-			console.log(pre,msg);
+					if ( token.startsWith("db") ) {
+						info.action = token.substr(2);
+						sql.query(log, info);
+					}
+						
+					else
+					if ( token.startsWith("dog") ) {
+						info.target = "db";
+						sql.query(log, info);
+					}
+						
+					else
+					if ( token.endsWith("ds") ) {
+					}
+					
+					else
+						sql.query(log, info);
+			}
+					
+
 		}
-		else
-			console.log(pre,msg);
 	},
 		
 	function serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing every regex using fetcher( rec, (ex) => "replace" )
