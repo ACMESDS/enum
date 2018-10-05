@@ -230,12 +230,12 @@ const {Each, Copy, Log} = ENUM;
 	function serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing every regex using fetcher( rec, (ex) => "replace" )
 		var 
 			recs = [],
-			results = this.replace(new RegExp(regex, "g"), (str, url, opt) => {
+			results = this.replace( regex, /*new RegExp(regex, "g"), */ (str, url, opt) => {  // put in place-holders
 				recs.push( new Object( {idx: recs.length, url: url, opt:opt} ) );
 				return key+(recs.length-1);
 			});
 
-		recs.serialize( fetcher, (rec,info) => {
+		recs.serialize( fetcher, (rec,info) => {  // update place-holders with info 
 			if (rec) 
 				results = results.replace(key+rec.idx, info);
 			
