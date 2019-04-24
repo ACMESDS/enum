@@ -13,7 +13,7 @@ ENUM provides a common set of enumerators:
 	Each(opts,cb) 				// enumerate opts Object with callback cb( n, opts[n], isLast )
  	[ prototype, ...].extend( Array || String || Date || Object ) 	// add prototype functions to constructor
 	[ rec, ...].each( cb )		// enumerate records with callback cb(rec , idx)
-	[ rec, ...].serialize(fetcher, cb)  // callback cb(rec,info) or cb(null,fails) at end, given a fetcher( rec, (info) => {...})
+	[ rec, ...].serialize(fetcher, cb)  // callback cb(rec,info) or cb(null,fails) at end using fetcher( rec, (info) => {...})
 	"...".serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing regex using fetcher( rec, (ex) => "replace" ) and placeholder key
 
 where 
