@@ -227,10 +227,10 @@ const {Each, Copy, Log} = ENUM;
 		}
 	},
 		
-	function serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing every regex using fetcher( rec, (ex) => "replace" )
+	function serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing regex using fetcher( rec, (ex) => "replace" ) and string place holder key
 		var 
 			recs = [],
-			results = this.replace( regex, /*new RegExp(regex, "g"), */ (str, url, opt) => {  // put in place-holders
+			results = this.replace( regex, (str, url, opt) => {  // put in place-holders
 				recs.push( new Object( {idx: recs.length, url: url, opt:opt} ) );
 				return key+(recs.length-1);
 			});
