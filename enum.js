@@ -154,19 +154,23 @@ const {Each, Copy, Log} = ENUM;
 
 		var fetched = 0, fails = 0, recs = this, fetches = recs.length;
 
-		if ( fetches ) // number of records to be fetched
-			recs.forEach( (rec,idx) => {  // fetch results for each record
-				fetchInfo( rec, (rec, results) => {  // process results
-					cb( rec, results );   // feed results to callback
+		if ( fetcher ) // serialize
+			if ( fetches ) // number of records to be fetched
+				recs.forEach( (rec,idx) => {  // fetch results for each record
+					fetchInfo( rec, (rec, results) => {  // process results
+						cb( rec, results );   // feed results to callback
 
-					if ( !results) fails++;
+						if ( !results) fails++;
 
-					if (++fetched == fetches) cb( null, fails );  // fetches exhausted so we are done
+						if (++fetched == fetches) cb( null, fails );  // fetches exhausted so we are done
+					});
 				});
-			});
 
-		else  // no records so we are done
-			cb( null, fails);
+			else  // no records so we are done
+				cb( null, fails);
+		
+		else // just enumerate
+			recs.forEach( cb );
 	}
 ].extend(Array);
 
