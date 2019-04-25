@@ -174,6 +174,33 @@ const {Each, Copy, Log} = ENUM;
 	}
 ].extend(Array);
 
+[ 
+	function serialize( indexer, cb ) {
+		var 
+			recs = [],
+			did = 0,
+			This = this;
+		
+		if (cb) {
+			indexer( (rec) => {		// index over the records
+				recs.push( new Object(rec) ); 	// push the returned record
+				This( rec, () => {
+					if ( ++did == recs.length )  { // if all records have been indexed  ..
+						recs.forEach( (rec) => cb(rec) ); 	// feed all records to callback
+						cb( null ); // signal at end
+					}
+				});
+			});
+			
+			if ( !did ) cb( null );  // signal at end
+		}
+		
+		else
+			indexer( This );
+			
+	}
+].extend(Function);
+
 [
 	function trace(msg,sql) {	
 		console.log(this+"",msg);
