@@ -32,7 +32,15 @@ Array.prototype.extend = function (con) {
 
 var ENUM = module.exports = {
 	Log: console.log,
-
+	
+	isString: (obj) => obj.constructor == String,
+	isNumber: (obj) => obj.constructor == Number,
+	isArray: (obj) => obj.constructor == Array,
+	isObject: (obj) => obj.constructor == isObject,
+	isDate: (obj) => obj.constructor == Date,
+	isFunction: (obj) => obj.constructor == Function,
+	isError: (obj) => obj.constructor == Error,
+	
 	Copy: (src,tar,deep) => {
 	/**
 	 @method copy

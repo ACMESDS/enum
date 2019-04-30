@@ -13,9 +13,10 @@ ENUM provides a common set of enumerators:
 	Each(opts,cb) 				// enumerate opts Object with callback cb( n, opts[n], isLast )
  	[ prototype, ...].extend( Array || String || Date || Object ) 	// add prototype functions to constructor
 	[ rec, ...].each( cb )		// enumerate records with callback cb(rec , idx)
-	[ rec, ...].serialize(fetcher, cb)  // callback cb(rec,info) or cb(null,fails) at end using fetcher( rec, (info) => {...})
-	"...".serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing regex using fetcher( rec, (ex) => "replace" ) and placeholder key
-
+	[ rec, ...].serialize(fetcher, cb)  // serialize list with callback cb(rec,info) or cb(null,fails) at end using fetcher( rec, (info) => {...})
+	"...".serialize( fetcher, regex, key, cb ) {  //< serialize string callback cb(str) after replacing regex using fetcher( rec, (ex) => "replace" ) and placeholder key
+	Function.serialize( indexer, cb ) //< serialize Function(rec, done) using indexer( (rec) => {...}) with callback cb(rec) or cb(null) at end 
+	
 where 
 
 * copy() will copy the source src to a target tar under supervision of an optional callback 
