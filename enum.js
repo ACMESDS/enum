@@ -41,6 +41,11 @@ var ENUM = module.exports = {
 	isFunction: (obj) => obj.constructor == Function,
 	isError: (obj) => obj.constructor == Error,
 	
+	isEmpty: (opts) => {
+		for ( var key in opts ) return false;
+		return true;
+	},
+	
 	Copy: (src,tar,deep) => {
 	/**
 	 @method copy
