@@ -7,21 +7,24 @@
 	
 # ENUM
 
-ENUM provides a common set of enumerators:
+ENUM provides simple enumerators:
 
-	Copy(src,tar,deep,cb)  // shallow or deep copy src to tar with optional callback cb()
-	Each(opts,cb) 				// enumerate opts Object with callback cb( n, opts[n], isLast )
- 	[ prototype, ...].extend( Array || String || Date || Object ) 	// add prototype functions to constructor
-	[ rec, ...].each( cb )		// enumerate records with callback cb(rec , idx)
-	[ rec, ...].serialize(fetcher, cb)  // serialize list with callback cb(rec,info) or cb(null,fails) at end using fetcher( rec, (info) => {...})
-	"...".serialize( fetcher, regex, key, cb ) {  //< serialize string callback cb(str) after replacing regex using fetcher( rec, (ex) => "replace" ) and placeholder key
-	Function.serialize( indexer, cb ) //< serialize Function(rec, done) using indexer( (rec) => {...}) with callback cb(rec) or cb(null) at end 
+	Copy(src,tar,deep)  // shallow or deep copy src to tar 
+	Each(opts,cb) 				// enumerate opts with callback cb( n, opts[n], isLast )
+	[ rec, ...].each( cb )		// enumerate list with callback cb(rec , idx)
 	
-where 
+a means to extend a constructor:
 
-* copy() will copy the source src to a target tar under supervision of an optional callback 
-cb(value) which returns true to drop.  If a deep key deliminator (e.g. ".") is 
-specified, the copy is deep with src keys treated as keys into the target thusly:
+ 	[ prototype, ...].extend( Array || String || Date || Object ) 	// extend constructor with prototypes
+	
+and list, string, and function serializers:
+
+	[ rec, ...].serialize(fetcher, cb)  // run fetcher( rec, (info) => {...}) with callback cb(rec,info) or cb(null,fails) at end
+	"...".serialize( fetcher, regex, key, cb ) {  //< replace regex using fetcher( rec, (ex) => "replace" ) and placeholder key with callback cb(str)
+	Function.serialize( indexer, cb ) //< run Function(rec, done) using indexer( (rec) => {...}) with callback cb(rec) or cb(null) at end 
+	
+If a deep copy key (e.g. ".") is specified, the copy is deep with src keys treated as keys 
+into the target thusly:
 
 	{
 		A: value,			// sets target[A] = value
@@ -41,8 +44,6 @@ specified, the copy is deep with src keys treated as keys into the target thusly
 			function X() {}
 	}
 
-+ Each() will shallow enumerate over its opts with callback cb(key,value).
-	
 ## Installation
 
 Clone [ENUM basic enumerators](https://github.com/acmesds/enum) into your PROJECT/enum folder.  

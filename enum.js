@@ -36,7 +36,7 @@ var ENUM = module.exports = {
 	isString: (obj) => obj.constructor == String,
 	isNumber: (obj) => obj.constructor == Number,
 	isArray: (obj) => obj.constructor == Array,
-	isObject: (obj) => obj.constructor == isObject,
+	isObject: (obj) => obj.constructor == Object,
 	isDate: (obj) => obj.constructor == Date,
 	isFunction: (obj) => obj.constructor == Function,
 	isError: (obj) => obj.constructor == Error,
@@ -290,5 +290,20 @@ const {Each, Copy, Log} = ENUM;
 	}
 	
 ].extend(String);
+
+//================== Unit testing
+
+switch (process.argv[2]) {	//< unit testers
+	case "?":
+		Log("unit test with 'npm enum.js [E1 || ...]'");
+		break;
+		
+	case "E1": 
+		Log({
+			shallowCopy: Copy( {a:1,b:2}, {} ),
+			deepCopy: Copy({ a:1,"b.x":2 }, {b:{x:100}}, ".")
+		});
+		break;
+}
 
 // UNCLASSIFIED

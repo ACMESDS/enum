@@ -4,7 +4,7 @@
   "description": "Add simple enumerates (copy,clone,each and extend) to the config hash.",
   "main": "enum.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node enum.js "
   },
   "repository": {
     "type": "git",
