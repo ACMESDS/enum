@@ -48,9 +48,11 @@ into the target thusly:
 
 Clone [ENUM basic enumerators](https://github.com/acmesds/enum) into your PROJECT/enum folder.  
 
-### Unit test:
+### Manage 
 
-	npm test [ ? || E1 || ...]
+	npm run [ edit || start ]			# Configure environment
+	npm test [ ? || E1 || ...]					# Unit test
+	npm run [ prmprep || prmload ]		# Revise PRM
 
 ## Usage
 
