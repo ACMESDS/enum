@@ -71,6 +71,9 @@ then extended again from some nextasm.js
 			:
 		});
 
+To run a unit test:
+
+	npm test [E1 | ...]
 
 ## License
 
