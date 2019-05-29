@@ -48,6 +48,10 @@ into the target thusly:
 
 Clone [ENUM basic enumerators](https://github.com/acmesds/enum) into your PROJECT/enum folder.  
 
+### Unit test:
+
+	npm test [ ? || E1 || ...]
+
 ## Usage
 
 From some assembly:
@@ -70,10 +74,6 @@ then extended again from some nextasm.js
 			:
 			:
 		});
-
-To run a unit test:
-
-	npm test [E1 | ...]
 
 ## License
 
