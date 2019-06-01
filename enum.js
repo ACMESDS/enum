@@ -33,15 +33,16 @@ Array.prototype.extend = function (con) {
 var ENUM = module.exports = {
 	Log: console.log,
 	
-	isString: (obj) => obj.constructor == String,
-	isNumber: (obj) => obj.constructor == Number,
-	isArray: (obj) => obj.constructor == Array,
-	isObject: (obj) => obj.constructor == Object,
-	isDate: (obj) => obj.constructor == Date,
-	isFunction: (obj) => obj.constructor == Function,
-	isError: (obj) => obj.constructor == Error,
+	isString: obj => obj.constructor.name == "String",
+	isNumber: obj => obj.constructor.name== "Number",
+	isArray: obj => obj.constructor.name == "Array",
+	isObject: obj => obj.constructor.name == "Object",
+	isDate: obj => obj.constructor.name == "Date",
+	isFunction: obj => obj.constructor.name == "Function",
+	isError: obj => obj.constructor.name == "Error",
+	isBoolean: obj => obj.constructor.name == "Boolean",
 	
-	isEmpty: (opts) => {
+	isEmpty: opts => {
 		for ( var key in opts ) return false;
 		return true;
 	},
