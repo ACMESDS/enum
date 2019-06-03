@@ -41,6 +41,7 @@ var ENUM = module.exports = {
 	isFunction: obj => obj.constructor.name == "Function",
 	isError: obj => obj.constructor.name == "Error",
 	isBoolean: obj => obj.constructor.name == "Boolean",
+	isBuffer: obj => obj.constructor.name == "Buffer",
 	
 	isEmpty: opts => {
 		for ( var key in opts ) return false;
