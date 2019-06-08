@@ -1,11 +1,12 @@
 /// UNCLASSIFIED 
 
+/*
 Array.prototype.each = 	function (cb) {
-/**
+/ **
 @method each
 @member Array
 Enumerate through array until optional callback(idx, val, isLast) returns isEmpty.  Returns isEmpty.
-*/
+* /
 	
 	if (cb) {
 		var last = this.length-1;
@@ -15,10 +16,11 @@ Enumerate through array until optional callback(idx, val, isLast) returns isEmpt
 	else
 		return !this.length;	
 }
+*/
 
-Array.prototype.extend = function (con) {
+Array.prototype.Extend = function (con) {
 /**
- * @method extend
+ * @method Extend
  * @member ENUM
  * Extend the opts prototype with specified methods, or, if no methods are provided, 
  * extend this ENUM with the given opts.  Array, String, Date, and Object keys are 
@@ -83,19 +85,19 @@ var ENUM = module.exports = {
 			if (deep) 
 				switch (key) {
 					case Array: 
-						val.extend(Array);
+						val.Extend(Array);
 						break;
 
 					case "String": 
-						val.extend(String);
+						val.Extend(String);
 						break;
 
 					case "Date": 
-						val.extend(Date);
+						val.Extend(Date);
 						break;
 
 					case "Object": 	
-						val.extend(Object);
+						val.Extend(Object);
 						break;
 
 					/*case "Function": 
@@ -187,7 +189,7 @@ const {Each, Copy, Log} = ENUM;
 		else // just enumerate
 			recs.forEach( cb );
 	}
-].extend(Array);
+].Extend(Array);
 
 [ 
 	function serialize( indexer, cb ) {
@@ -214,7 +216,7 @@ const {Each, Copy, Log} = ENUM;
 			indexer( This );
 			
 	}
-].extend(Function);
+].Extend(Function);
 
 [
 	function trace(msg,sql) {	
@@ -291,7 +293,7 @@ const {Each, Copy, Log} = ENUM;
 
 	}
 	
-].extend(String);
+].Extend(String);
 
 //================== Unit testing
 
