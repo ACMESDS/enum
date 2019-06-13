@@ -9,15 +9,15 @@
 
 ENUM provides simple enumerators:
 
-	Copy(src,tar,deep)  // shallow or deep copy src to tar 
-	Each(opts,cb) 				// enumerate opts with callback cb( n, opts[n], isLast )
-	[ rec, ...].each( cb )		// enumerate list with callback cb(rec , idx)
+	Copy(src,tar)  		// shallow copy src to tar 
+	Copy(src,tar,key)  // deep copy src to tar 
+	Each(opts,cb) 		// enumerate opts with callback cb( n, opts[n], isLast )
 	
 a means to extend a constructor:
 
- 	[ prototype, ...].extend( Array || String || Date || Object ) 	// extend constructor with prototypes
+ 	[ prototype, ...].Extend( Array || String || Date || Object ) 	// extend constructor with prototypes
 	
-and list, string, and function serializers:
+as well as list, string, and function serializers:
 
 	[ rec, ...].serialize(fetcher, cb)  // run fetcher( rec, (info) => {...}) with callback cb(rec,info) or cb(null,fails) at end
 	"...".serialize( fetcher, regex, key, cb ) {  //< replace regex using fetcher( rec, (ex) => "replace" ) and placeholder key with callback cb(str)

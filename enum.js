@@ -1,23 +1,5 @@
 /// UNCLASSIFIED 
 
-/*
-Array.prototype.each = 	function (cb) {
-/ **
-@method each
-@member Array
-Enumerate through array until optional callback(idx, val, isLast) returns isEmpty.  Returns isEmpty.
-* /
-	
-	if (cb) {
-		var last = this.length-1;
-		this.forEach( (val,idx) => cb( idx, this[idx], idx == last ) );
-	}
-	
-	else
-		return !this.length;	
-}
-*/
-
 Array.prototype.Extend = function (con) {
 /**
  * @method Extend
