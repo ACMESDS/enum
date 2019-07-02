@@ -50,7 +50,7 @@ as well as a list serializer:
 a string serializer:
 
 	function fetcher( rec, ex => {
-		// regexp arguments contained in rec.arg1, rec.arg2, ...
+		// regexp arguments rec.arg0, rec.arg1, rec.arg2, ...
 		// rec.ID = record number being processed
 		return "replaced string";
 	});

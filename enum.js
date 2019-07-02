@@ -260,9 +260,9 @@ const {Each, Copy, Log} = ENUM;
 	function serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing regex using fetcher( rec, (ex) => "replace" ) and string place holder key
 		var 
 			recs = [],
-			results = this.replace( regex, (str, arg1, arg2, arg3, arg4) => {  // put in place-holders
+			results = this.replace( regex, (arg0, arg1, arg2, arg3, arg4) => {  // put in place-holders
 				//recs.push( new Object( {idx: recs.length, url: url, opt:opt} ) );
-				recs.push( new Object( {ID: recs.length, arg1:arg1, arg2:arg2, arg3:arg3, arg4:arg4} ) );
+				recs.push( new Object( {ID: recs.length, arg0:arg0, arg1:arg1, arg2:arg2, arg3:arg3, arg4:arg4} ) );
 				return key+(recs.length-1);
 			});
 
