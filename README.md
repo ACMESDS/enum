@@ -13,18 +13,7 @@ ENUM provides simple enumerators:
 	Copy(src,tar,key)  // deep copy src to tar 
 	Each(opts,cb) 		// enumerate opts with callback cb( n, opts[n], isLast )
 	
-a means to extend a constructor:
-
- 	[ prototype, ...].Extend( Array || String || Date || Object ) 	// extend constructor with prototypes
-	
-as well as list, string, and function serializers:
-
-	[ rec, ...].serialize(fetcher, cb)  // run fetcher( rec, (info) => {...}) with callback cb(rec,info) or cb(null,fails) at end
-	"...".serialize( fetcher, regex, key, cb ) {  //< replace regex using fetcher( rec, (ex) => "replace" ) and placeholder key with callback cb(str)
-	Function.serialize( indexer, cb ) //< run Function(rec, done) using indexer( (rec) => {...}) with callback cb(rec) or cb(null) at end 
-	
-If a deep copy key (e.g. ".") is specified, the copy is deep with src keys treated as keys 
-into the target thusly:
+If a deep copy key (e.g. ".") is specified, src keys treated as keys into the target thusly:
 
 	{
 		A: value,			// sets target[A] = value
@@ -43,6 +32,42 @@ into the target thusly:
 		Function: 			// append method X to ENUM callback stack
 			function X() {}
 	}
+
+ENUM also provides a means to extend constructors:
+
+ 	[ prototype, ...].Extend( Array || String || Date || Object )
+	
+as well as a list serializer:
+
+	function fetcher( rec, info => { 
+	});
+	
+	[ rec, ...].serialize(fetcher, (rec, failures) => {
+		// rec = record || null at end
+		// failures = number of failed fetches
+	}
+	
+a string serializer:
+
+	function fetcher( rec, ex => {
+		// regexp arguments contained in rec.arg1, rec.arg2, ...
+		// rec.ID = record number being processed
+		return "replaced string";
+	});
+	
+	"string to search".serialize( fetcher, regex, "placeholder key", str => { 
+		// str is final string with all replacements
+	});
+	
+and a function serializer:
+
+	function indexer( rec => {
+	...
+	});
+	
+	Function.serialize( indexer, rec => {  // runs Function(rec, done) until rec is null 
+		// rec = record || null at end
+	}) 
 
 ## Installation
 

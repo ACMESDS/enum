@@ -155,7 +155,7 @@ const {Each, Copy, Log} = ENUM;
 
 		if ( fetcher ) // serialize
 			if ( fetches ) // number of records to be fetched
-				recs.forEach( (rec,idx) => {  // fetch results for each record
+				recs.forEach( rec => {  // fetch results for each record
 					fetchInfo( rec, (rec, results) => {  // process results
 						cb( rec, results );   // feed results to callback
 
@@ -260,14 +260,16 @@ const {Each, Copy, Log} = ENUM;
 	function serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing regex using fetcher( rec, (ex) => "replace" ) and string place holder key
 		var 
 			recs = [],
-			results = this.replace( regex, (str, url, opt) => {  // put in place-holders
-				recs.push( new Object( {idx: recs.length, url: url, opt:opt} ) );
+			results = this.replace( regex, (str, arg1, arg2, arg3, arg4) => {  // put in place-holders
+				//recs.push( new Object( {idx: recs.length, url: url, opt:opt} ) );
+				recs.push( new Object( {ID: recs.length, arg1:arg1, arg2:arg2, arg3:arg3, arg4:arg4} ) );
 				return key+(recs.length-1);
 			});
 
 		recs.serialize( fetcher, (rec,info) => {  // update place-holders with info 
 			if (rec) 
-				results = results.replace(key+rec.idx, info);
+				//results = results.replace(key+rec.idx, info);
+				results = results.replace(key+rec.ID, info);
 			
 			else
 				cb( results );
