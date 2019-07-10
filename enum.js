@@ -32,6 +32,17 @@ var ENUM = module.exports = {
 		return true;
 	},
 	
+	Serialize: function (obj, fetcher, cb) {
+		
+		var recs = [];
+		Each( obj, (key, val) => recs.push( {ID: recs.length, arg0: key, arg1: val} ) );
+		
+		recs.serialize( (rec,cb) => fetcher( rec.arg1, info => {
+				obj[ rec.arg0 ] = info; 
+				cb(rec,info);
+			}), (rec,info) => { if (!rec) cb(obj); });
+	},
+	
 	Copy: (src,tar,deep) => {
 	/**
 	 @method copy
@@ -148,7 +159,7 @@ const {Each, Copy, Log} = ENUM;
 [	
 	function serialize(fetcher, cb) {  //< callback cb(rec,info) or cb(null,fails) at end using fetcher( rec, (info) => {...})
 		function fetchInfo(rec, cb) {  
-			fetcher(rec , (info) => cb(rec, info) );
+			fetcher(rec , info => cb(rec, info) );
 		}
 
 		var fetched = 0, fails = 0, recs = this, fetches = recs.length;
@@ -262,7 +273,7 @@ const {Each, Copy, Log} = ENUM;
 			recs = [],
 			results = this.replace( regex, (arg0, arg1, arg2, arg3, arg4) => {  // put in place-holders
 				//recs.push( new Object( {idx: recs.length, url: url, opt:opt} ) );
-				recs.push( new Object( {ID: recs.length, arg0:arg0, arg1:arg1, arg2:arg2, arg3:arg3, arg4:arg4} ) );
+				recs.push( new Object( {ID: recs.length, arg0:arg0, arg1:arg1, arg2:arg2, arg3:arg3, arg4:arg4} ) );  //<<<< need new Object ??
 				return key+(recs.length-1);
 			});
 
