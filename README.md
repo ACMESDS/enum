@@ -77,7 +77,7 @@ a function serializer:
 			// done
 	}) 
 	
-and an object seria;izer:
+and an object serializer:
 
 	function fetcher(val, cb) {
 		fetch( val, result => cb(result) );
