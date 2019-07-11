@@ -196,11 +196,11 @@ const {Each, Copy, Log} = ENUM;
 			This = this;
 		
 		if (cb) {
-			indexer( (rec) => {		// index over the records
+			indexer( rec => {		// index over the records
 				recs.push( new Object(rec) ); 	// push the returned record
 				This( rec, () => {
 					if ( ++did == recs.length )  { // if all records have been indexed  ..
-						recs.forEach( (rec) => cb(rec) ); 	// feed all records to callback
+						recs.forEach( rec => cb(rec) ); 	// feed all records to callback
 						cb( null ); // signal at end
 					}
 				});
@@ -277,7 +277,8 @@ const {Each, Copy, Log} = ENUM;
 			recs = [],
 			results = this.replace( regex, (arg0, arg1, arg2, arg3, arg4) => {  // put in place-holders
 				//recs.push( new Object( {idx: recs.length, url: url, opt:opt} ) );
-				recs.push( new Object( {ID: recs.length, arg0:arg0, arg1:arg1, arg2:arg2, arg3:arg3, arg4:arg4} ) );  //<<<< need new Object ??
+				//recs.push( new Object( {ID: recs.length, arg0:arg0, arg1:arg1, arg2:arg2, arg3:arg3, arg4:arg4} ) );  //<<<< need new Object ??
+				recs.push( {ID: recs.length, arg0:arg0, arg1:arg1, arg2:arg2, arg3:arg3, arg4:arg4} );
 				return key+(recs.length-1);
 			});
 
