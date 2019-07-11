@@ -10,10 +10,13 @@
 ENUM provides simple enumerators:
 
 	Copy(src,tar)  		// shallow copy src to tar 
-	Copy(src,tar,key)  // deep copy src to tar 
 	Each(opts,cb) 		// enumerate opts with callback cb( n, opts[n], isLast )
 	
-If a deep copy key (e.g. ".") is specified, src keys treated as keys into the target thusly:
+If a deep copy is required:
+
+	Copy(src,tar,key)  // deep copy src to tar 
+
+src keys index the target thusly (with key = "."):
 
 	{
 		A: value,			// sets target[A] = value
@@ -42,9 +45,11 @@ as well as a list serializer:
 	function fetcher( rec, info => { 
 	});
 	
-	[ rec, ...].serialize(fetcher, (rec, failures) => {
-		// rec = record || null at end
-		// failures = number of failed fetches
+	[ rec, ...].serialize( fetcher, (rec, fails) => {
+		if ( rec ) 
+			// rec = record being serialized
+		else
+			// done. fails = number of failed fetches
 	}
 	
 a string serializer:
@@ -56,18 +61,31 @@ a string serializer:
 	});
 	
 	"string to search".serialize( fetcher, regex, "placeholder key", str => { 
-		// str is final string with all replacements
+		// str = final string with all replacements made
 	});
 	
-and a function serializer:
+a function serializer:
 
 	function indexer( rec => {
 	...
 	});
 	
 	Function.serialize( indexer, rec => {  // runs Function(rec, done) until rec is null 
-		// rec = record || null at end
+		if ( rec )
+			// rec = record being serialized
+		else
+			// done
 	}) 
+	
+and an object seria;izer:
+
+	function fetcher(val, cb) {
+		fetch( val, result => cb(result) );
+	}
+	
+	Serialize( obj, fetcher, obj => {
+		// obj will all keys fetched
+	})
 
 ## Installation
 
