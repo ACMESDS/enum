@@ -34,13 +34,17 @@ var ENUM = module.exports = {
 	
 	Serialize: function (obj, fetcher, cb) {
 		
+		function fetch(rec, cb) {
+			fetcher( rec.arg1, info => {
+				obj[ rec.arg0 ] = info; 
+				cb(rec,info);
+			});
+		}
+		
 		var recs = [];
 		Each( obj, (key, val) => recs.push( {ID: recs.length, arg0: key, arg1: val} ) );
 		
-		recs.serialize( (rec,cb) => fetcher( rec.arg1, info => {
-				obj[ rec.arg0 ] = info; 
-				cb(rec,info);
-			}), (rec,info) => { if (!rec) cb(obj); });
+		recs.serialize( fetch, (rec,info) => { if (!rec) cb(obj); });
 	},
 	
 	Copy: (src,tar,deep) => {
