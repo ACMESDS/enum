@@ -1,13 +1,13 @@
 /// UNCLASSIFIED 
 
 Array.prototype.Extend = function (con) {
-/**
- * @method Extend
- * @member ENUM
- * Extend the opts prototype with specified methods, or, if no methods are provided, 
- * extend this ENUM with the given opts.  Array, String, Date, and Object keys are 
- * interpretted to extend their respective prototypes.  
- * */
+/*
+@method Extend
+@member ENUM
+Extend the opts prototype with specified methods, or, if no methods are provided, 
+extend this ENUM with the given opts.  Array, String, Date, and Object keys are 
+interpretted to extend their respective prototypes.  
+*/
 	this.forEach( function (proto) {
 		//console.log("ext", proto.name, con);
 		con.prototype[proto.name] = proto;
