@@ -161,7 +161,11 @@ var ENUM = module.exports = {
 const {Each, Copy, Log} = ENUM;
 
 [	
-	function serialize(fetcher, cb) {  //< callback cb(rec,info) or cb(null,fails) at end using fetcher( rec, (info) => {...})
+	function serialize(fetcher, cb) {  
+		/*
+		callback cb(rec,info) for each record and cb(null,fails) at end, where the
+		fetcher( rec, info => {...}) provides the cb info on each record.
+		*/
 		function fetchInfo(rec, cb) {  
 			fetcher(rec , info => cb(rec, info) );
 		}
