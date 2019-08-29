@@ -106,22 +106,23 @@ var ENUM = module.exports = {
 						var 
 							keys = key.split(deep), 
 							Tar = tar,
-							idx = keys[0];
+							idx = keys[0],
+							N = keys.length-1;
 						
-						for (  // index to the element to set/append
-								var n=0,N=keys.length-1 ; 
-								n < N ; 
-								idx = keys[++n]	) 	
-								
-							if ( idx in Tar ) 
+						for ( var n=0; n < N ;  idx = keys[++n]	) { // index to the element to set/append
+							if ( idx in Tar ) {
+								if ( !Tar[idx] ) Tar[idx] = new Object();
 								Tar = Tar[idx];
+							}
+								
 							else
 								Tar = Tar[idx] = new Array();
-
-						if (idx)  // set target
+						}
+						
+						if (idx)  // not null so update target
 							Tar[idx] = val;
 
-						else  // append to target
+						else  // null so append to target
 						if (val.constructor == Object) 
 							for (var n in val) 
 								Tar[n] = val[n];
