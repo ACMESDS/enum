@@ -14,40 +14,10 @@ interpretted to extend their respective prototypes.
 	});
 }
 
-var ENUM = module.exports = {
-	Log: console.log,
-	
-	isString: obj => obj.constructor.name == "String",
-	isNumber: obj => obj.constructor.name== "Number",
-	isArray: obj => obj.constructor.name == "Array",
-	isObject: obj => obj.constructor.name == "Object",
-	isDate: obj => obj.constructor.name == "Date",
-	isFunction: obj => obj.constructor.name == "Function",
-	isError: obj => obj.constructor.name == "Error",
-	isBoolean: obj => obj.constructor.name == "Boolean",
-	isBuffer: obj => obj.constructor.name == "Buffer",
-	
-	isEmpty: opts => {
-		for ( var key in opts ) return false;
-		return true;
-	},
-	
-	Serialize: function (obj, fetcher, cb) {
-		
-		function fetch(rec, cb) {
-			fetcher( rec.arg1, info => {
-				obj[ rec.arg0 ] = info; 
-				cb(rec,info);
-			});
-		}
-		
-		var recs = [];
-		Each( obj, (key, val) => recs.push( {ID: recs.length, arg0: key, arg1: val} ) );
-		
-		recs.serialize( fetch, (rec,info) => { if (!rec) cb(obj); });
-	},
-	
-	Copy: (src,tar,deep) => {
+var
+	Log = console.log,
+
+	Copy = (src,tar,deep) => {
 	/**
 	 @method copy
 	 @member ENUM
@@ -55,26 +25,26 @@ var ENUM = module.exports = {
 	 @param {Object} tar target hash
 	 @param {String} deep copy key 
 	 @return {Object} target hash
-	 
+
 	 Copy source hash to target hash; thus Copy({...}, {}) is equivalent to new Object({...}).
 	 If a deep deliminator (e.g. ".") is provided, src  keys are treated as keys into the target thusly:
-	 
-	 		{	
-	 			A: value,			// sets target[A] = value
-	 
-	 			"A.B.C": value, 	// sets target[A][B][C] = value
-	 
-	 			"A.B.C.": {			// appends X,Y to target[A][B][C]
-	 				X:value, Y:value, ...
-	 			},	
-	 
-	 			OBJECT: [ 			// prototype OBJECT (Array,String,Date,Object) = method X,Y, ...
-	 				function X() {}, 
-	 				function Y() {}, 
-	 			... ]
-	 
-	 		} 
-	 
+
+			{	
+				A: value,			// sets target[A] = value
+
+				"A.B.C": value, 	// sets target[A][B][C] = value
+
+				"A.B.C.": {			// appends X,Y to target[A][B][C]
+					X:value, Y:value, ...
+				},	
+
+				OBJECT: [ 			// prototype OBJECT (Array,String,Date,Object) = method X,Y, ...
+					function X() {}, 
+					function Y() {}, 
+				... ]
+
+			} 
+
 	 */
 		for (var key in src) {
 			var val = src[key];
@@ -108,17 +78,17 @@ var ENUM = module.exports = {
 							Tar = tar,
 							idx = keys[0],
 							N = keys.length-1;
-						
+
 						for ( var n=0; n < N ;  idx = keys[++n]	) { // index to the element to set/append
 							if ( idx in Tar ) {
 								if ( !Tar[idx] ) Tar[idx] = new Object();
 								Tar = Tar[idx];
 							}
-								
+
 							else
 								Tar = Tar[idx] = new Array();
 						}
-						
+
 						if (idx)  // not null so update target
 							Tar[idx] = val;
 
@@ -130,7 +100,7 @@ var ENUM = module.exports = {
 						else
 							Tar.push( val );
 				}
-			
+
 			else
 				tar[key] = val;
 		}
@@ -138,7 +108,7 @@ var ENUM = module.exports = {
 		return tar;
 	},
 
-	Each: (src,cb) => {
+	Each = (src,cb) => {
 	/**
 	 * @method each
 	 * @member ENUM
@@ -155,11 +125,46 @@ var ENUM = module.exports = {
 			keys.forEach( (key,idx) => cb(key, src[key], idx == last ) );
 
 		return keys.length==0;
-	}
+	};
 
-};
+var ENUM = module.exports = opts => Copy( opts || {} , ENUM);
 
-const {Each, Copy, Log} = ENUM;
+Copy({
+	isString: obj => obj.constructor.name == "String",
+	isNumber: obj => obj.constructor.name== "Number",
+	isArray: obj => obj.constructor.name == "Array",
+	isObject: obj => obj.constructor.name == "Object",
+	isDate: obj => obj.constructor.name == "Date",
+	isFunction: obj => obj.constructor.name == "Function",
+	isError: obj => obj.constructor.name == "Error",
+	isBoolean: obj => obj.constructor.name == "Boolean",
+	isBuffer: obj => obj.constructor.name == "Buffer",
+	
+	isEmpty: opts => {
+		for ( var key in opts ) return false;
+		return true;
+	},
+	
+	Serialize: function (obj, fetcher, cb) {
+		
+		function fetch(rec, cb) {
+			fetcher( rec.arg1, info => {
+				obj[ rec.arg0 ] = info; 
+				cb(rec,info);
+			});
+		}
+		
+		var recs = [];
+		Each( obj, (key, val) => recs.push( {ID: recs.length, arg0: key, arg1: val} ) );
+		
+		recs.serialize( fetch, (rec,info) => { if (!rec) cb(obj); });
+	},
+	
+	Copy: Copy,
+	Each: Each,
+	Log: Log
+	
+}, ENUM);
 
 [	
 	function serialize(fetcher, cb) {  
