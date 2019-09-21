@@ -127,9 +127,7 @@ var
 		return keys.length==0;
 	};
 
-var ENUM = module.exports = opts => Copy( opts || {} , ENUM);
-
-Copy({
+var ENUM = module.exports = {
 	isString: obj => obj.constructor.name == "String",
 	isNumber: obj => obj.constructor.name== "Number",
 	isArray: obj => obj.constructor.name == "Array",
@@ -164,7 +162,7 @@ Copy({
 	Each: Each,
 	Log: Log
 	
-}, ENUM);
+};
 
 [	
 	function serialize(fetcher, cb) {  

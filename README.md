@@ -101,25 +101,10 @@ Clone [ENUM basic enumerators](https://github.com/acmesds/enum) into your PROJEC
 
 From some assembly:
 
-	var
-		ENUM = require("enum"),
-		ASM = module.exports = ENUM.extend({  // see ENUM.copy for key syntax
-			key: value,
-			key: value,
-			:
-			:
-		});
+	var ENUM = require("enum");
 		
-then extended again from some nextasm.js
-
-	var 
-		ASM = require("asm"),
-		NEXTASM = module.exports = ASM.extend({
-			key: value,
-			:
-			:
-		});
-
+	const { Copy, Each } = ENUM;  	// extract these from enum
+	
 ## License
 
 [MIT](LICENSE)
