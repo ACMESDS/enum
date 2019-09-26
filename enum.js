@@ -14,20 +14,50 @@ interpretted to extend their respective prototypes.
 	});
 }
 
-var
-	Log = console.log,
+const { Copy, Each, Log, isObject, isArray } = module.exports = {
+	isString: obj => obj.constructor.name == "String",
+	isNumber: obj => obj.constructor.name== "Number",
+	isArray: obj => obj.constructor.name == "Array",
+	isObject: obj => obj.constructor.name == "Object",
+	isDate: obj => obj.constructor.name == "Date",
+	isFunction: obj => obj.constructor.name == "Function",
+	isError: obj => obj.constructor.name == "Error",
+	isBoolean: obj => obj.constructor.name == "Boolean",
+	isBuffer: obj => obj.constructor.name == "Buffer",
+	
+	isEmpty: opts => {
+		for ( var key in opts ) return false;
+		return true;
+	},
+	
+	Serialize: function (obj, fetcher, cb) {
+		
+		function fetch(rec, cb) {
+			fetcher( rec.arg1, info => {
+				obj[ rec.arg0 ] = info; 
+				cb(rec,info);
+			});
+		}
+		
+		var recs = [];
+		Each( obj, (key, val) => recs.push( {ID: recs.length, arg0: key, arg1: val} ) );
+		
+		recs.serialize( fetch, (rec,info) => { if (!rec) cb(obj); });
+	},
+	
+	Log: console.log,
 
-	Copy = (src,tar,deep) => {
+	Copy: (src,tar,deep) => {
 	/**
-	 @method copy
-	 @member ENUM
-	 @param {Object} src source hash
-	 @param {Object} tar target hash
-	 @param {String} deep copy key 
-	 @return {Object} target hash
+	@method copy
+	@member ENUM
+	@param {Object} src source hash
+	@param {Object} tar target hash
+	@param {String} deep copy key 
+	@return {Object} target hash
 
-	 Copy source hash to target hash; thus Copy({...}, {}) is equivalent to new Object({...}).
-	 If a deep deliminator (e.g. ".") is provided, src  keys are treated as keys into the target thusly:
+	Copy source hash to target hash; thus Copy({...}, {}) is equivalent to new Object({...}).
+	If a deep deliminator (e.g. ".") is provided, src  keys are treated as keys into the target thusly:
 
 			{	
 				A: value,			// sets target[A] = value
@@ -44,7 +74,6 @@ var
 				... ]
 
 			} 
-
 	 */
 		for (var key in src) {
 			var val = src[key];
@@ -108,15 +137,62 @@ var
 		return tar;
 	},
 
-	Each = (src,cb) => {
+	Each: ( A, cb ) => {
 	/**
+	@method each
+	@member ENUM
+	@param {Object} A source object or array
+	@param {Function} cb callback (key,val, cb) 
+	 
+	Enumerates A with callback cb(key,val,xcb).  If the cb wishes to be serialized, then it
+	should test and callback xcb according to:
+	
+			if (xcb) 
+				xcb( rec )  // where rec = null to bypass rec stacking
+			
+			else 
+				// key is resulting rec stack when indexing of A has finished
+	*/
+		
+		var 
+			calls = 0, returns = 0;
+
+		if ( isObject(A) ) {
+			var recs = {};
+			Object.keys(A).forEach( key => {
+				calls++;
+				cb( key, A[key], rec => {
+					if (rec) recs[key] = rec;
+					if ( ++returns == calls ) cb(recs);
+				});
+			});
+		}
+
+		else
+		if ( isArray(A) ) {
+			var recs = [];
+			A.forEach( (key,val) => {
+				calls++;
+				cb( key, val, rec => {
+					if (rec) recs.push(rec);
+					if ( ++returns == calls ) cb(recs);
+				});
+			});
+		}
+
+		// if ( !calls && returns ) cb(recs);
+	}
+	 
+	/*
+	Each = (src,cb) => {
+	/ **
 	 * @method each
 	 * @member ENUM
 	 * @param {Object} src source hash
 	 * @param {Function} cb callback (idx,val, isLast) returns true or false to terminate
 	 * 
 	 * Enumerates src with optional callback cb(idx,val,isLast) and returns isEmpty.
-	 * */
+	 * * /
 		var 
 			keys = Object.keys(src),
 			last = keys.length-1;
@@ -126,42 +202,7 @@ var
 
 		return keys.length==0;
 	};
-
-var ENUM = module.exports = {
-	isString: obj => obj.constructor.name == "String",
-	isNumber: obj => obj.constructor.name== "Number",
-	isArray: obj => obj.constructor.name == "Array",
-	isObject: obj => obj.constructor.name == "Object",
-	isDate: obj => obj.constructor.name == "Date",
-	isFunction: obj => obj.constructor.name == "Function",
-	isError: obj => obj.constructor.name == "Error",
-	isBoolean: obj => obj.constructor.name == "Boolean",
-	isBuffer: obj => obj.constructor.name == "Buffer",
-	
-	isEmpty: opts => {
-		for ( var key in opts ) return false;
-		return true;
-	},
-	
-	Serialize: function (obj, fetcher, cb) {
-		
-		function fetch(rec, cb) {
-			fetcher( rec.arg1, info => {
-				obj[ rec.arg0 ] = info; 
-				cb(rec,info);
-			});
-		}
-		
-		var recs = [];
-		Each( obj, (key, val) => recs.push( {ID: recs.length, arg0: key, arg1: val} ) );
-		
-		recs.serialize( fetch, (rec,info) => { if (!rec) cb(obj); });
-	},
-	
-	Copy: Copy,
-	Each: Each,
-	Log: Log
-	
+	*/
 };
 
 [	
