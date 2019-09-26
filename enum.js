@@ -157,24 +157,23 @@ const { Copy, Each, Log, isObject, isArray } = module.exports = {
 		var 
 			calls = 0, returns = 0;
 
-		if ( isObject(A) ) {
-			var recs = {};
-			Object.keys(A).forEach( key => {
-				calls++;
-				cb( key, A[key], rec => {
-					if (rec) recs[key] = rec;
-					if ( ++returns == calls ) cb(recs);
-				});
-			});
-		}
-
-		else
 		if ( isArray(A) ) {
 			var recs = [];
 			A.forEach( (key,val) => {
 				calls++;
 				cb( key, val, rec => {
 					if (rec) recs.push(rec);
+					if ( ++returns == calls ) cb(recs);
+				});
+			});
+		}
+		
+		else {
+			var recs = {};
+			Object.keys(A).forEach( key => {
+				calls++;
+				cb( key, A[key], rec => {
+					if (rec) recs[key] = rec;
 					if ( ++returns == calls ) cb(recs);
 				});
 			});
