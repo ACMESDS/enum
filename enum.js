@@ -14,11 +14,11 @@ interpretted to extend their respective prototypes.
 	});
 }
 
-const { Copy, Each, Log, isObject, isArray } = module.exports = {
+const { Copy, Each, Log, isArray } = module.exports = {
 	isString: obj => obj.constructor.name == "String",
 	isNumber: obj => obj.constructor.name== "Number",
 	isArray: obj => obj.constructor.name == "Array",
-	isObject: obj => obj.constructor.name == "Object",
+	isKeyed: obj => Object.keys(obj).length ? true : false,
 	isDate: obj => obj.constructor.name == "Date",
 	isFunction: obj => obj.constructor.name == "Function",
 	isError: obj => obj.constructor.name == "Error",
@@ -155,9 +155,21 @@ const { Copy, Each, Log, isObject, isArray } = module.exports = {
 	*/
 		
 		var 
-			calls = 0, returns = 0;
+			calls = 0, returns = 0, keys = Object.keys(A);
 
-		if ( isArray(A) ) {
+		if ( keys.length ) {
+			var recs = {};
+			keys.forEach( key => {
+				calls++;
+				cb( key, A[key], rec => {
+					if (rec) recs[key] = rec;
+					if ( ++returns == calls ) cb(recs);
+				});
+			});
+		}
+		
+		else
+		if ( A.forEach ) {
 			var recs = [];
 			A.forEach( (key,val) => {
 				calls++;
@@ -168,17 +180,6 @@ const { Copy, Each, Log, isObject, isArray } = module.exports = {
 			});
 		}
 		
-		else {
-			var recs = {};
-			Object.keys(A).forEach( key => {
-				calls++;
-				cb( key, A[key], rec => {
-					if (rec) recs[key] = rec;
-					if ( ++returns == calls ) cb(recs);
-				});
-			});
-		}
-
 		// if ( !calls && returns ) cb(recs);
 	}
 	 
