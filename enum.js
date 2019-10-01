@@ -19,6 +19,7 @@ const { Copy, Each, Log, isArray } = module.exports = {
 	isNumber: obj => obj.constructor.name== "Number",
 	isArray: obj => obj.constructor.name == "Array",
 	isKeyed: obj => Object.keys(obj).length ? true : false,
+	isObject: obj => obj.constructor.name == "Object",
 	isDate: obj => obj.constructor.name == "Date",
 	isFunction: obj => obj.constructor.name == "Function",
 	isError: obj => obj.constructor.name == "Error",
