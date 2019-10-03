@@ -238,6 +238,7 @@ const { Copy, Each, Log, isArray } = module.exports = {
 	}
 ].Extend(Array);
 
+/*
 [ 
 	function serialize( indexer, cb ) {
 		var 
@@ -264,6 +265,7 @@ const { Copy, Each, Log, isArray } = module.exports = {
 			
 	}
 ].Extend(Function);
+*/
 
 [
 	function trace(msg,sql) {	
@@ -326,15 +328,12 @@ const { Copy, Each, Log, isArray } = module.exports = {
 		var 
 			recs = [],
 			results = this.replace( regex, (arg0, arg1, arg2, arg3, arg4) => {  // put in place-holders
-				//recs.push( new Object( {idx: recs.length, url: url, opt:opt} ) );
-				//recs.push( new Object( {ID: recs.length, arg0:arg0, arg1:arg1, arg2:arg2, arg3:arg3, arg4:arg4} ) );  //<<<< need new Object ??
 				recs.push( {ID: recs.length, arg0:arg0, arg1:arg1, arg2:arg2, arg3:arg3, arg4:arg4} );
 				return key+(recs.length-1);
 			});
 
 		recs.serialize( fetcher, (rec,info) => {  // update place-holders with info 
 			if (rec) 
-				//results = results.replace(key+rec.idx, info);
 				results = results.replace(key+rec.ID, info);
 			
 			else

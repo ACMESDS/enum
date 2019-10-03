@@ -7,16 +7,12 @@
 	
 # ENUM
 
-ENUM provides simple enumerators:
+ENUM provides a shallow and deep copy enumerator:
 
 	Copy(src,tar)  		// shallow copy src to tar 
-	Each(opts,cb) 		// enumerate opts with callback cb( n, opts[n], isLast )
-	
-If a deep copy is required:
-
 	Copy(src,tar,key)  // deep copy src to tar 
 
-src keys index the target thusly (with key = "."):
+where, in a deep copy, src keys index the target thusly (with key = "."):
 
 	{
 		A: value,			// sets target[A] = value
@@ -40,7 +36,19 @@ ENUM also provides a means to extend constructors:
 
  	[ prototype, ...].Extend( Array || String || Date || Object )
 	
-as well as a list serializer:
+as well as list and object serializers:
+
+	Each(opts,cb) 		// enumerate and/or serialize list/object opts with callback cb( n, opts[n], xcb )
+
+where the cb may elect to serialize itself by testing and calling back xcb as follows:
+	
+		if (xcb) 
+			xcb( rec )  // where rec = null to bypass rec stacking
+
+		else 
+			// key is resulting rec stack when indexing of A has finished
+
+ENUM provides a list:
 
 	function fetcher( rec, info => { 
 	});
@@ -52,7 +60,7 @@ as well as a list serializer:
 			// done. fails = number of failed fetches
 	}
 	
-a string serializer:
+and a string serializer:
 
 	function fetcher( rec, ex => {
 		// regexp arguments rec.arg0, rec.arg1, rec.arg2, ...
@@ -64,29 +72,6 @@ a string serializer:
 		// str = final string with all replacements made
 	});
 	
-a function serializer:
-
-	function indexer( rec => {
-	...
-	});
-	
-	Function.serialize( indexer, rec => {  // runs Function(rec, done) until rec is null 
-		if ( rec )
-			// rec = record being serialized
-		else
-			// done
-	}) 
-	
-and an object serializer:
-
-	function fetcher(val, cb) {
-		fetch( val, result => cb(result) );
-	}
-	
-	Serialize( obj, fetcher, obj => {
-		// obj will all keys fetched
-	})
-
 ## Installation
 
 Clone [ENUM basic enumerators](https://github.com/acmesds/enum) into your PROJECT/enum folder.  
