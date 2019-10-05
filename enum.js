@@ -14,23 +14,25 @@ interpretted to extend their respective prototypes.
 	});
 }
 
-const { Copy, Each, Log, isArray } = module.exports = {
-	isString: obj => obj.constructor.name == "String",
-	isNumber: obj => obj.constructor.name== "Number",
-	isArray: obj => obj.constructor.name == "Array",
+const { Copy, Each, Log, isArray, typeOf, Stream, isKeyed } = module.exports = {
+	typeOf: obj => obj.constructor.name,
+	isString: obj => typeOf(obj) == "String",
+	isNumber: obj => typeOf(obj)== "Number",
+	isArray: obj => typeOf(obj) == "Array",
 	isKeyed: obj => Object.keys(obj).length ? true : false,
-	isObject: obj => obj.constructor.name == "Object",
-	isDate: obj => obj.constructor.name == "Date",
-	isFunction: obj => obj.constructor.name == "Function",
-	isError: obj => obj.constructor.name == "Error",
-	isBoolean: obj => obj.constructor.name == "Boolean",
-	isBuffer: obj => obj.constructor.name == "Buffer",
+	isObject: obj => typeOf(obj) == "Object",
+	isDate: obj => typeOf(obj) == "Date",
+	isFunction: obj => typeOf(obj) == "Function",
+	isError: obj => typeOf(obj) == "Error",
+	isBoolean: obj => typeOf(obj) == "Boolean",
+	isBuffer: obj => typeOf(obj) == "Buffer",
 	
 	isEmpty: opts => {
 		for ( var key in opts ) return false;
 		return true;
 	},
 	
+	/*
 	Serialize: function (obj, fetcher, cb) {
 		
 		function fetch(rec, cb) {
@@ -45,12 +47,13 @@ const { Copy, Each, Log, isArray } = module.exports = {
 		
 		recs.serialize( fetch, (rec,info) => { if (!rec) cb(obj); });
 	},
+	*/
 	
 	Log: console.log,
 
 	Copy: (src,tar,deep) => {
 	/**
-	@method copy
+	@method Copy
 	@member ENUM
 	@param {Object} src source hash
 	@param {Object} tar target hash
@@ -140,78 +143,84 @@ const { Copy, Each, Log, isArray } = module.exports = {
 
 	Each: ( A, cb ) => {
 	/**
-	@method each
+	@method Each
 	@member ENUM
-	@param {Object} A source object or array
-	@param {Function} cb callback (key,val, cb) 
+	@param {Object, Array} A source object or array
+	@param {Function} cb callback (key,val) 
 	 
-	Enumerates A with callback cb(key,val,xcb).  If the cb wishes to be serialized, then it
-	should test and callback xcb according to:
-	
-			if (xcb) 
-				xcb( rec )  // where rec = null to bypass rec stacking
-			
-			else 
-				// key is resulting rec stack when indexing of A has finished
+	Enumerates all elements of A (null or not) with callback cb(key,val).
 	*/
-		
 		var 
-			calls = 0, returns = 0, keys = Object.keys(A);
+			keys = Object.keys(A);
 
-		if ( keys.length ) {
-			var recs = {};
-			keys.forEach( key => {
-				calls++;
-				cb( key, A[key], rec => {
-					if (rec) recs[key] = rec;
-					if ( ++returns == calls ) cb(recs);
-				});
-			});
-		}
+		if ( keys.length ) 
+			keys.forEach( key => cb( key, A[key] ) );
 		
 		else
-		if ( A.forEach ) {
-			var recs = [];
-			A.forEach( (key,val) => {
-				calls++;
-				cb( key, val, rec => {
-					if (rec) recs.push(rec);
-					if ( ++returns == calls ) cb(recs);
-				});
-			});
-		}
-		
-		// if ( !calls && returns ) cb(recs);
-	}
+		if ( A.forEach ) 
+			A.forEach( (key,val) => cb( key, val ) );
+	},
+	
+	Stream: (recs,cb) => {	
+	/**
+	@method Stream
+	@member ENUM
+	@param {Object, Array} A source object or array
+	@param {Function} cb callback ( rec, xcb) 
 	 
-	/*
-	Each = (src,cb) => {
-	/ **
-	 * @method each
-	 * @member ENUM
-	 * @param {Object} src source hash
-	 * @param {Function} cb callback (idx,val, isLast) returns true or false to terminate
-	 * 
-	 * Enumerates src with optional callback cb(idx,val,isLast) and returns isEmpty.
-	 * * /
-		var 
-			keys = Object.keys(src),
-			last = keys.length-1;
+	Enumerates A with callback cb( rec, xcb ) at each non-null record then cb( null, msgs ) 
+	at end, where the cb should:
+	
+		if ( rec ) // indexing 
+			xcb( msg )  // pass null msg to bypass msg stacking
 
-		if (cb)
-			keys.forEach( (key,idx) => cb(key, src[key], idx == last ) );
-
-		return keys.length==0;
-	};
+		else 
+			// indexing done: key = rec stack, val  = stack depth				
 	*/
+		var 
+			calls = 0, 
+			returns = 0, 
+			keyed = isKeyed(recs),
+			msgs = keyed ? {} : [];
+
+		Each( recs, (key,rec) => {
+			if ( rec ) {	// drop null records
+				calls++;
+				cb( rec, msg => {
+					if ( msg ) 
+						if ( keyed ) 
+							msgs[key] = msg;
+						else
+							msgs.push( msg );
+					
+					if ( ++returns == calls ) cb( null, msgs );
+				});
+			}
+		});
+		
+		if ( !calls ) cb( null, msgs );
+	}
 };
 
 [	
-	function serialize(fetcher, cb) {  
-		/*
+	function serialize(fetcher, cb) {
+		Stream( this, (rec,xcb) => {
+			if ( rec )
+				fetcher( rec, info => {
+					cb(rec, info);	// forward results
+					xcb();	// signal record processed and discard results
+				});	
+			
+			else
+				cb( null, xcb );
+		});
+	}
+	/*
+	function xxserialize(fetcher, cb) {  
+		/ *
 		callback cb(rec,info) for each record and cb(null,fails) at end, where the
 		fetcher( rec, info => {...}) provides the cb info on each record.
-		*/
+		* /
 		function fetchInfo(rec, cb) {  
 			fetcher(rec , info => cb(rec, info) );
 		}
@@ -235,7 +244,7 @@ const { Copy, Each, Log, isArray } = module.exports = {
 		
 		else // just enumerate
 			recs.forEach( cb );
-	}
+	} */
 ].Extend(Array);
 
 /*
