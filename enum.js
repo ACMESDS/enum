@@ -14,7 +14,7 @@ interpretted to extend their respective prototypes.
 	});
 }
 
-const { Copy, Each, Log, isArray, typeOf, Stream, isKeyed } = module.exports = {
+const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = {
 	typeOf: obj => obj.constructor.name,
 	isString: obj => typeOf(obj) == "String",
 	isNumber: obj => typeOf(obj)== "Number",
@@ -31,23 +31,6 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isKeyed } = module.exports = {
 		for ( var key in opts ) return false;
 		return true;
 	},
-	
-	/*
-	Serialize: function (obj, fetcher, cb) {
-		
-		function fetch(rec, cb) {
-			fetcher( rec.arg1, info => {
-				obj[ rec.arg0 ] = info; 
-				cb(rec,info);
-			});
-		}
-		
-		var recs = [];
-		Each( obj, (key, val) => recs.push( {ID: recs.length, arg0: key, arg1: val} ) );
-		
-		recs.serialize( fetch, (rec,info) => { if (!rec) cb(obj); });
-	},
-	*/
 	
 	Log: console.log,
 
@@ -150,25 +133,21 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isKeyed } = module.exports = {
 	 
 	Enumerates all elements of A (null or not) with callback cb(key,val).
 	*/
-		var 
-			keys = Object.keys(A);
-
-		if ( keys.length ) 
-			keys.forEach( key => cb( key, A[key] ) );
-		
-		else
 		if ( A.forEach ) 
-			A.forEach( (key,val) => cb( key, val ) );
+			A.forEach( (val,idx) => cb( idx, val ) );
+
+		else
+			Object.keys(A).forEach( key => cb( key, A[key] ) );
 	},
 	
-	Stream: (recs,cb) => {	
+	Stream: (A,cb) => {	
 	/**
 	@method Stream
 	@member ENUM
 	@param {Object, Array} A source object or array
 	@param {Function} cb callback ( rec, xcb) 
 	 
-	Enumerates A with callback cb( rec, xcb ) at each non-null record then cb( null, msgs ) 
+	Stream Array/Object A to callback cb( rec, xcb ) at each non-null record, then cb( null, msgs ) 
 	at end, where the cb should:
 	
 		if ( rec ) // indexing 
@@ -180,22 +159,26 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isKeyed } = module.exports = {
 		var 
 			calls = 0, 
 			returns = 0, 
-			keyed = isKeyed(recs),
-			msgs = keyed ? {} : [];
+			indexed = isArray(A),
+			msgs = indexed ? [] : {};
 
-		Each( recs, (key,rec) => {
-			if ( rec ) {	// drop null records
+		Each( A, (key,rec) => {
+			if ( rec ) 	// drop null records
 				calls++;
+		});
+		
+		Each( A, (key, rec) => {
+			if (rec)
 				cb( rec, msg => {
 					if ( msg ) 
-						if ( keyed ) 
-							msgs[key] = msg;
-						else
+						if ( indexed ) 
 							msgs.push( msg );
+						else
+							msgs[key] = msg;
 					
-					if ( ++returns == calls ) cb( null, msgs );
+					if ( ++returns == calls ) 
+						cb( null, msgs );
 				});
-			}
 		});
 		
 		if ( !calls ) cb( null, msgs );
@@ -204,77 +187,23 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isKeyed } = module.exports = {
 
 [	
 	function serialize(fetcher, cb) {
+	/*
+	Serialize this Array to the callback cb(rec,info) or cb(null,stack) at end given 
+	a sync/async fetcher( rec, xcb ).
+	*/
+		
 		Stream( this, (rec,xcb) => {
 			if ( rec )
 				fetcher( rec, info => {
 					cb(rec, info);	// forward results
-					xcb();	// signal record processed and discard results
+					xcb();	// signal record processed w/o stacking any results
 				});	
 			
-			else
+			else 
 				cb( null, xcb );
 		});
 	}
-	/*
-	function xxserialize(fetcher, cb) {  
-		/ *
-		callback cb(rec,info) for each record and cb(null,fails) at end, where the
-		fetcher( rec, info => {...}) provides the cb info on each record.
-		* /
-		function fetchInfo(rec, cb) {  
-			fetcher(rec , info => cb(rec, info) );
-		}
-
-		var fetched = 0, fails = 0, recs = this, fetches = recs.length;
-
-		if ( fetcher ) // serialize
-			if ( fetches ) // number of records to be fetched
-				recs.forEach( rec => {  // fetch results for each record
-					fetchInfo( rec, (rec, results) => {  // process results
-						cb( rec, results );   // feed results to callback
-
-						if ( !results) fails++;
-
-						if (++fetched == fetches) cb( null, fails );  // fetches exhausted so we are done
-					});
-				});
-
-			else  // no records so we are done
-				cb( null, fails);
-		
-		else // just enumerate
-			recs.forEach( cb );
-	} */
 ].Extend(Array);
-
-/*
-[ 
-	function serialize( indexer, cb ) {
-		var 
-			recs = [],
-			did = 0,
-			This = this;
-		
-		if (cb) {
-			indexer( rec => {		// index over the records
-				recs.push( new Object(rec) ); 	// push the returned record
-				This( rec, () => {
-					if ( ++did == recs.length )  { // if all records have been indexed  ..
-						recs.forEach( rec => cb(rec) ); 	// feed all records to callback
-						cb( null ); // signal at end
-					}
-				});
-			});
-			
-			if ( !did ) cb( null );  // signal at end
-		}
-		
-		else
-			indexer( This );
-			
-	}
-].Extend(Function);
-*/
 
 [
 	function trace(msg,sql) {	
@@ -334,6 +263,20 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isKeyed } = module.exports = {
 	},
 		
 	function serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing regex using fetcher( rec, (ex) => "replace" ) and string place holder key
+	/*
+	Serialize this String to the callback(results) given a sync/asyn fetcher(rec,xcb) where
+	rec = {ID, arg0, arg1, ...} contains args produced by regex.  Provide a unique placeholder
+	key to back-substitute results.
+	
+	For example:
+	
+		"junkabc;junkdef;"
+		.serialize( (rec,cb) => cb("$"), /junk([^;]*);/g, "@tag", msg => console.log(msg) )
+	
+	produces:
+	
+		"$$"
+*/
 		var 
 			recs = [],
 			results = this.replace( regex, (arg0, arg1, arg2, arg3, arg4) => {  // put in place-holders
@@ -344,13 +287,12 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isKeyed } = module.exports = {
 		recs.serialize( fetcher, (rec,info) => {  // update place-holders with info 
 			if (rec) 
 				results = results.replace(key+rec.ID, info);
-			
-			else
+
+			else 
 				cb( results );
 		});
 
 	}
-	
 ].Extend(String);
 
 //================== Unit testing
