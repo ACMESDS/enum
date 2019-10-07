@@ -162,7 +162,7 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 			indexed = isArray(A),
 			msgs = indexed ? [] : {};
 
-		Each( A, (key,rec) => {
+		Each( A, (key,rec) => {	// must precount if callback is sync
 			if ( rec ) 	// drop null records
 				calls++;
 		});
