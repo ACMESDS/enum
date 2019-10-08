@@ -1,5 +1,8 @@
 /// UNCLASSIFIED 
 
+var
+	OS = require("os");
+
 Array.prototype.Extend = function (con) {
 /*
 @method Extend
@@ -206,12 +209,35 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 ].Extend(Array);
 
 [
-	function trace(msg,sql) {	
-		console.log(this+"",msg);
-
-		if (sql) {
-			var 
-				log = "INSERT INTO openv.syslogs SET ? ON DUPLICATE KEY UPDATE Count=Count+1",
+	function trace(msg,req,fwd) {	
+		function cpu() {
+			var sum = 0, util = OS.loadavg();
+			for ( var n=0, N = util.length; n<N; n++) sum += util[0];
+			return sum / N;
+		}
+		
+		function mem() {
+			return OS.freemem() / OS.totalmem();
+		}
+		
+		if ( fwd ) fwd(msg);
+		
+		if ( req ) {
+			const { sql, client, action, table } = req;
+			
+			if ( sql ) 
+				sql.query( "INSERT INTO openv.syslogs SET ? ", {
+					Client: client,
+					Table: table,
+					At: new Date(),
+					Action: action,
+					Module: this,
+					cpuUtil: cpu(),
+					memUtil: mem(),
+					Message: msg+""
+				});
+			
+			/*
 				tokens = msg.toLowerCase().split(" "),
 				info = {action: tokens[0], target: tokens[1], module: this+"", t: new Date(), on: "", for: ""};
 			
@@ -256,10 +282,11 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 					
 					else
 						sql.query(log, info);
-			}
-					
-
+			}	*/
 		}
+		
+		else
+			Log(this+msg);
 	},
 		
 	function serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing regex using fetcher( rec, (ex) => "replace" ) and string place holder key
