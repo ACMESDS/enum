@@ -220,73 +220,27 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 			return OS.freemem() / OS.totalmem();
 		}
 		
-		if ( fwd ) fwd(msg);
+		if ( fwd ) fwd(this.substr(0,2).toUpperCase()+">"+msg);
 		
 		if ( req ) {
-			const { sql, client, action, table } = req;
+			const { sql, query, client, action, table } = req;
 			
 			if ( sql ) 
 				sql.query( "INSERT INTO openv.syslogs SET ? ", {
 					Client: client,
 					Table: table,
 					At: new Date(),
+					Case: query.Name || "",
 					Action: action,
 					Module: this,
 					cpuUtil: cpu(),
 					memUtil: mem(),
 					Message: msg+""
 				});
-			
-			/*
-				tokens = msg.toLowerCase().split(" "),
-				info = {action: tokens[0], target: tokens[1], module: this+"", t: new Date(), on: "", for: ""};
-			
-			tokens.forEach( (token, idx) => {
-				if ( idx ) 
-					if ( idx % 2 == 0 )
-						if ( token in info )
-							info[token] = tokens[idx+1];
-			});
-			
-			switch ( token = tokens[0] ) {
-				case "select":
-				case "update":
-				case "insert":
-				case "delete":
-					info.action = "sql";
-					info.target = "dataset";
-					sql.query(log, info);
-					break;
-
-				case "sendfile": 
-					info.target = info.target.split(".").pop();
-					sql.query(log, info);
-					break;
-					
-				default:
-
-					if ( token.startsWith("db") ) {
-						info.action = token.substr(2);
-						sql.query(log, info);
-					}
-						
-					else
-					if ( token.startsWith("dog") ) {
-						info.target = "db";
-						sql.query(log, info);
-					}
-						
-					else
-					if ( token.endsWith("ds") ) {
-					}
-					
-					else
-						sql.query(log, info);
-			}	*/
 		}
 		
 		else
-			Log(this+msg);
+			Log(this.substr(0,2).toUpperCase()+">"+msg);
 	},
 		
 	function serialize( fetcher, regex, key, cb ) {  //< callback cb(str) after replacing regex using fetcher( rec, (ex) => "replace" ) and string place holder key
