@@ -17,7 +17,7 @@ interpretted to extend their respective prototypes.
 	});
 }
 
-const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = {
+const { Copy, Each, Log, isArray, typeOf, Serialize, isObject } = module.exports = {
 	typeOf: obj => obj.constructor.name,
 	isString: obj => typeOf(obj) == "String",
 	isNumber: obj => typeOf(obj)== "Number",
@@ -143,7 +143,7 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 			Object.keys(A).forEach( key => cb( key, A[key] ) );
 	},
 	
-	Stream: (A,cb) => {	
+	Serialize: (A,cb) => {	
 	/**
 	@method Stream
 	@member ENUM
@@ -165,7 +165,7 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 			indexed = isArray(A),
 			msgs = indexed ? [] : {};
 
-		Each( A, (key,rec) => {	// must precount if callback is sync
+		Each( A, (key,rec) => {	// must precount as callback could be sync
 			if ( rec ) 	// drop null records
 				calls++;
 		});
@@ -186,6 +186,7 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 		
 		if ( !calls ) cb( null, msgs );
 	}
+	
 };
 
 [	
@@ -195,7 +196,7 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 	a sync/async fetcher( rec, xcb ).
 	*/
 		
-		Stream( this, (rec,xcb) => {
+		Serialize( this, (rec,xcb) => {
 			if ( rec )
 				fetcher( rec, info => {
 					cb(rec, info);	// forward results
