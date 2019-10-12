@@ -17,7 +17,7 @@ interpretted to extend their respective prototypes.
 	});
 }
 
-const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = {
+const { Copy, Each, Log, isArray, typeOf, Serialize, isObject } = module.exports = {
 	typeOf: obj => obj.constructor.name,
 	isString: obj => typeOf(obj) == "String",
 	isNumber: obj => typeOf(obj)== "Number",
