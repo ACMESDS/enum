@@ -148,40 +148,35 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 	@method Stream
 	@member ENUM
 	@param {Object, Array} A source object or array
-	@param {Function} cb callback ( rec, xcb) 
+	@param {Function} cb callback ( rec, key, xcb) 
 	 
-	Stream Array/Object A to callback cb( rec, xcb ) at each non-null record, then cb( null, msgs ) 
-	at end, where the cb should:
+	Stream Array/Object A to callback at each record, then callback again at end, where:
 	
-		if ( rec ) // indexing 
-			xcb( msg )  // pass null msg to bypass msg stacking
+		cb( (rec,key,xcb) => {
+			if ( xcb ) // still indexing 
+				xcb( msg )  // pass nothing to bypass msg stacking
 
-		else 
-			// indexing done: key = rec stack, val  = stack depth				
+			else 
+				// indexing done key contains msg stack
+		})
 	*/
 		var 
-			calls = 0, 
 			returns = 0, 
 			indexed = isArray(A),
+			calls = indexed ? A.length : Object.keys(A).length, 
 			msgs = indexed ? [] : {};
 
-		Each( A, (key,rec) => {	// must precount if callback is sync
-			if ( rec ) 	// drop null records
-				calls++;
-		});
-		
 		Each( A, (key, rec) => {
-			if (rec)
-				cb( rec, msg => {
-					if ( msg ) 
-						if ( indexed ) 
-							msgs.push( msg );
-						else
-							msgs[key] = msg;
-					
-					if ( ++returns == calls ) 
-						cb( null, msgs );
-				});
+			cb( rec, key, msg => {
+				if ( msg != undefined ) 
+					if ( indexed ) 
+						msgs.push( msg );
+					else
+						msgs[key] = msg;
+
+				if ( ++returns == calls ) 
+					cb( null, msgs );
+			});
 		});
 		
 		if ( !calls ) cb( null, msgs );
@@ -195,8 +190,8 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 	a sync/async fetcher( rec, xcb ).
 	*/
 		
-		Stream( this, (rec,xcb) => {
-			if ( rec )
+		Stream( this, (rec, key, xcb) => {
+			if ( xcb )
 				fetcher( rec, info => {
 					cb(rec, info);	// forward results
 					xcb();	// signal record processed w/o stacking any results
