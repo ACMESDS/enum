@@ -1,7 +1,16 @@
 /// UNCLASSIFIED 
 
+/**
+@class ENUM
+Provides basic enumerators as documented in README.md.
+
+@requires os
+@requires cluster
+*/
+
 var
-	OS = require("os");
+	OS = require("os"),
+	CLUSTER = require("cluster");
 
 Array.prototype.Extend = function (con) {
 /*
@@ -215,6 +224,10 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 			return OS.freemem() / OS.totalmem();
 		}
 		
+		function node() {
+			return OS.hostname()+"."+(CLUSTER.isMaster ? 0 : CLUSTER.worker.id);
+		}
+		
 		if ( fwd ) fwd(this.substr(0,2).toUpperCase()+">"+msg);
 		
 		if ( req ) {
@@ -222,6 +235,7 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 			
 			if ( sql ) 
 				sql.query( "INSERT INTO openv.syslogs SET ? ", {
+					Node: node(),
 					Client: client,
 					Table: table,
 					At: new Date(),
