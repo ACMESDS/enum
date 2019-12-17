@@ -276,7 +276,7 @@ const { Copy, Each, Log, isArray, typeOf, Stream, isObject } = module.exports = 
 
 		recs.serialize( fetcher, (rec,info) => {  // update place-holders with info 
 			if (rec) 
-				results = results.replace(key+rec.ID, info);
+				results = results.replace( key+rec.ID, str => info );
 
 			else 
 				cb( results );
